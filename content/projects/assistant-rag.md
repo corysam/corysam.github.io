@@ -3,7 +3,6 @@ name: Assistant RAG en production
 status: In development
 role: Conception & développement
 order: 3
-lab: true
 description: Un assistant qui répond à partir d'un corpus documentaire, avec évaluations automatisées, suivi des coûts et observabilité.
 mission: >-
   Construire de bout en bout un service LLM tel qu'on l'attend en production

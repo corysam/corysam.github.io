@@ -4,7 +4,7 @@
 import fs from "fs";
 import path from "path";
 import matter from "gray-matter";
-import type { Lab, LabNode, Profile, Project, ProjectLink, Recommendation, StackRow } from "./types";
+import type { AccentName, Experiment, Lab, Profile, Project, ProjectLink, Recommendation, StackRow } from "./types";
 
 /** Racine du contenu. Paramétrable pour permettre de tester sur des fixtures. */
 const defaultContentDir = () => path.join(process.cwd(), "content");
@@ -76,7 +76,6 @@ export function getProjects(contentDir: string = defaultContentDir()): Project[]
         method: text(data.method),
         result: text(data.result),
         order: toOrder(data.order),
-        lab: data.lab === true,
         links: toLinks(data.links),
         images: toImages(data.images),
       } satisfies Project;
@@ -84,33 +83,98 @@ export function getProjects(contentDir: string = defaultContentDir()): Project[]
     .sort((a, b) => a.order - b.order);
 }
 
+// ---- Expériences -----------------------------------------------------------
+// Petits projets personnels du Laboratory. Même tolérance que les projets : un
+// fichier à peine commencé se charge, `npm run check:content` signale les trous.
+
+const ACCENTS: AccentName[] = ["green", "cyan", "yellow", "red", "violet"];
+
+/** `accent` pilote une variable CSS : hors liste, la bulle n'aurait pas de couleur. */
+function toAccent(value: unknown): AccentName {
+  const accent = text(value) as AccentName;
+  return ACCENTS.includes(accent) ? accent : "violet";
+}
+
+function toPercent(value: unknown, fallback: number): number {
+  const n = typeof value === "string" ? Number(value) : value;
+  return typeof n === "number" && Number.isFinite(n) ? n : fallback;
+}
+
+/**
+ * Position de repli d'une bulle sans x/y : sur un cercle plutôt qu'en (0,0),
+ * pour qu'une expérience tout juste créée ne se superpose pas aux autres.
+ */
+function fallbackPosition(index: number, total: number) {
+  const angle = (index / Math.max(total, 1)) * 2 * Math.PI - Math.PI / 2;
+  return { x: 50 + Math.cos(angle) * 32, y: 50 + Math.sin(angle) * 30 };
+}
+
+function toTech(value: unknown): string[] {
+  if (!Array.isArray(value)) return [];
+  return value.map(text).filter((item) => item !== "");
+}
+
+export function getExperiments(contentDir: string = defaultContentDir()): Experiment[] {
+  const dir = path.join(contentDir, "experiments");
+  // Le dossier peut ne pas exister tant qu'aucune expérience n'est écrite.
+  if (!fs.existsSync(dir)) return [];
+
+  const files = fs.readdirSync(dir).filter((f) => f.endsWith(".md"));
+
+  return files
+    .map((file, i) => {
+      const id = file.replace(/\.md$/, "");
+      const { data } = matter(fs.readFileSync(path.join(dir, file), "utf8"));
+      const name = text(data.name) || nameFromId(id);
+      const spread = fallbackPosition(i, files.length);
+
+      return {
+        id,
+        name,
+        // La bulle est étroite : `label` est le texte court, `name` le titre de la fiche.
+        label: text(data.label) || name,
+        category: text(data.category),
+        accent: toAccent(data.accent),
+        x: toPercent(data.x, spread.x),
+        y: toPercent(data.y, spread.y),
+        order: toOrder(data.order),
+        status: text(data.status),
+        year: text(data.year),
+        description: text(data.description),
+        idea: text(data.idea),
+        learnings: text(data.learnings),
+        nextSteps: text(data.nextSteps),
+        tech: toTech(data.tech),
+        links: toLinks(data.links),
+        images: toImages(data.images),
+      } satisfies Experiment;
+    })
+    .sort((a, b) => a.order - b.order);
+}
+
 // ---- Formes sur disque ----------------------------------------------------
-// Le CMS ne sait pas éditer un tableau JSON racine ni un tuple : les fichiers
-// portent une enveloppe. Elle s'arrête ici — les loaders renvoient les types
-// du domaine, inchangés.
+// Le CMS ne sait pas éditer un tuple : les arêtes sont stockées en objets
+// { from, to }. L'enveloppe s'arrête ici — le loader renvoie le type du domaine.
 
-type LabFile = { nodes: LabNode[]; edges: { from: string; to: string }[] };
+type LabFile = { edges?: { from: string; to: string }[] };
 
-export function getLab(projects: Project[], contentDir: string = defaultContentDir()): Lab {
-  const lab = readJson<LabFile>(contentDir, "lab.json");
-  const projectIds = new Set(projects.map((p) => p.id));
-  const nodeIds = new Set(lab.nodes.map((n) => n.id));
+export function getLab(experiments: Experiment[], contentDir: string = defaultContentDir()): Lab {
+  const file = path.join(contentDir, "lab.json");
+  // Les bulles vivent dans content/experiments/ : le graphe s'affiche même
+  // sans fichier d'arêtes.
+  const lab: LabFile = fs.existsSync(file) ? JSON.parse(fs.readFileSync(file, "utf8")) : {};
+  const ids = new Set(experiments.map((e) => e.id));
 
-  for (const node of lab.nodes) {
-    if (!projectIds.has(node.projectId)) {
-      throw new Error(`content/lab.json : la bulle "${node.id}" référence un projet inconnu "${node.projectId}"`);
-    }
-  }
   // Une arête vers un id inconnu est ignorée (avec avertissement) au lieu de faire planter le rendu.
-  const edges = lab.edges
+  const edges = (lab.edges ?? [])
     .map(({ from, to }) => [from, to] as [string, string])
     .filter(([a, b]) => {
-      const valid = nodeIds.has(a) && nodeIds.has(b);
-      if (!valid) console.warn(`content/lab.json : arête ignorée [${a}, ${b}] — id de bulle inconnu`);
+      const valid = ids.has(a) && ids.has(b);
+      if (!valid) console.warn(`content/lab.json : arête ignorée [${a}, ${b}] — expérience inconnue`);
       return valid;
     });
 
-  return { nodes: lab.nodes, edges };
+  return { experiments, edges };
 }
 
 export function getStack(contentDir: string = defaultContentDir()): StackRow[] {

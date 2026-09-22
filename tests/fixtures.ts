@@ -1,4 +1,4 @@
-import type { Lab, Profile, Project, Recommendation, StackRow } from "@/lib/types";
+import type { Experiment, Lab, Profile, Project, Recommendation, StackRow } from "@/lib/types";
 
 // Contenu de test volontairement indépendant de content/ : les tests doivent
 // rester verts quand le vrai contenu du portfolio change.
@@ -14,7 +14,6 @@ export const makeProject = (over: Partial<Project> = {}): Project => ({
   method: "Méthode d'Alpha.",
   result: "Résultat d'Alpha.",
   order: 1,
-  lab: false,
   links: [],
   images: [],
   ...over,
@@ -22,26 +21,43 @@ export const makeProject = (over: Partial<Project> = {}): Project => ({
 
 export const gridProject = makeProject({ id: "alpha", name: "Alpha" });
 
-export const labProjectA = makeProject({
+export const makeExperiment = (over: Partial<Experiment> = {}): Experiment => ({
   id: "lab-a",
-  name: "Lab A",
-  lab: true,
-  status: "In development",
+  name: "Automates cellulaires",
+  label: "Automata",
+  category: "Simulation",
+  accent: "violet",
+  x: 20,
+  y: 30,
+  order: 1,
+  status: "Prototype",
+  year: "2025",
+  description: "Une grille qui s'anime toute seule.",
+  idea: "Voir si je pouvais écrire la règle 110 en une soirée.",
+  learnings: "Le rendu par canvas coûte moins cher que le DOM.",
+  nextSteps: "Ajouter un éditeur de règles.",
+  tech: ["TypeScript", "Canvas"],
+  links: [],
+  images: [],
+  ...over,
 });
 
-export const labProjectB = makeProject({
+export const experimentA = makeExperiment({ id: "lab-a", name: "Lab A", label: "Bulle A" });
+
+export const experimentB = makeExperiment({
   id: "lab-b",
   name: "Lab B",
-  lab: true,
-  status: "In development",
+  label: "Bulle B",
+  category: "Jeu",
+  accent: "red",
+  x: 70,
+  y: 60,
+  order: 2,
 });
 
 export const lab: Lab = {
-  nodes: [
-    { id: "n1", label: "Bulle A", category: "IA", accent: "violet", x: 20, y: 30, projectId: "lab-a" },
-    { id: "n2", label: "Bulle B", category: "Jeu", accent: "red", x: 70, y: 60, projectId: "lab-b" },
-  ],
-  edges: [["n1", "n2"]],
+  experiments: [experimentA, experimentB],
+  edges: [["lab-a", "lab-b"]],
 };
 
 export const profile: Profile = {

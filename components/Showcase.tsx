@@ -1,27 +1,34 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { Projects } from "./Projects";
 import { Laboratory } from "./Laboratory";
 import { ProjectModal } from "./ProjectModal";
-import type { Lab, Project } from "@/lib/types";
+import { ExperimentModal } from "./ExperimentModal";
+import type { Experiment, Lab, Project } from "@/lib/types";
 
-// Seul état client de la page : le projet ouvert dans la modale,
-// partagé entre la grille de projets et les bulles du Laboratory.
+/**
+ * La fiche ouverte : projet ou expérience, jamais les deux. Un seul état plutôt
+ * que deux — deux `useState` indépendants finiraient par diverger et laisser
+ * deux dialogues ouverts en même temps.
+ */
+type OpenSheet = { kind: "project"; project: Project } | { kind: "experiment"; experiment: Experiment };
+
+// Seul état client de la page, partagé entre la grille de projets et les
+// bulles du Laboratory.
 export function Showcase({ projects, lab }: { projects: Project[]; lab: Lab }) {
-  const [active, setActive] = useState<Project | null>(null);
-
-  const gridProjects = useMemo(() => projects.filter((p) => !p.lab), [projects]);
-  const projectsById = useMemo(
-    () => Object.fromEntries(projects.map((p) => [p.id, p])),
-    [projects]
-  );
+  const [open, setOpen] = useState<OpenSheet | null>(null);
+  const close = () => setOpen(null);
 
   return (
     <>
-      <Projects projects={gridProjects} onOpen={setActive} />
-      <Laboratory lab={lab} projectsById={projectsById} onOpen={setActive} />
-      <ProjectModal project={active} onClose={() => setActive(null)} />
+      <Projects projects={projects} onOpen={(project) => setOpen({ kind: "project", project })} />
+      <Laboratory lab={lab} onOpen={(experiment) => setOpen({ kind: "experiment", experiment })} />
+      <ProjectModal project={open?.kind === "project" ? open.project : null} onClose={close} />
+      <ExperimentModal
+        experiment={open?.kind === "experiment" ? open.experiment : null}
+        onClose={close}
+      />
     </>
   );
 }

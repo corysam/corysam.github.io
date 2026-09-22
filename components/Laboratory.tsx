@@ -3,26 +3,21 @@
 import { useEffect, useRef } from "react";
 import { Section } from "./Section";
 import { LabBubble } from "./LabBubble";
-import type { Lab, Project } from "@/lib/types";
+import type { Experiment, Lab } from "@/lib/types";
 
 export function Laboratory({
   lab,
-  projectsById,
   onOpen,
 }: {
   lab: Lab;
-  projectsById: Record<string, Project>;
-  onOpen: (p: Project) => void;
+  onOpen: (e: Experiment) => void;
 }) {
-  const { nodes, edges } = lab;
+  // Une expérience porte à la fois sa fiche et sa bulle : plus d'indirection
+  // entre un noeud du graphe et le contenu qu'il ouvre.
+  const { experiments, edges } = lab;
   const containerRef = useRef<HTMLDivElement>(null);
   const nodeRefs = useRef<(HTMLDivElement | null)[]>([]);
   const lineRefs = useRef<(SVGLineElement | null)[]>([]);
-
-  const open = (projectId: string) => {
-    const project = projectsById[projectId];
-    if (project) onOpen(project);
-  };
 
   // Flottement des bulles + lignes qui les suivent, sans passer par le state
   // React (audit B2) : les transforms et attributs SVG sont mis à jour
@@ -31,13 +26,13 @@ export function Laboratory({
     const container = containerRef.current;
     if (!container) return;
 
-    const nodeIndex = new Map(nodes.map((n, i) => [n.id, i]));
-    const offsets = nodes.map(() => ({ x: 0, y: 0 }));
+    const nodeIndex = new Map(experiments.map((e, i) => [e.id, i]));
+    const offsets = experiments.map(() => ({ x: 0, y: 0 }));
 
     const applyFrame = (elapsed: number) => {
       const w = container.clientWidth;
       const h = container.clientHeight;
-      nodes.forEach((_, i) => {
+      experiments.forEach((_, i) => {
         offsets[i].x = Math.sin(elapsed * 0.7 + i * 1.3) * 10;
         offsets[i].y = Math.cos(elapsed * 0.6 + i * 2.1) * 12;
         const el = nodeRefs.current[i];
@@ -51,10 +46,10 @@ export function Laboratory({
         const ib = nodeIndex.get(b);
         // Arête vers une bulle inconnue : ignorée au lieu de planter (audit B4).
         if (!line || ia === undefined || ib === undefined) return;
-        line.setAttribute("x1", String((nodes[ia].x / 100) * w + offsets[ia].x));
-        line.setAttribute("y1", String((nodes[ia].y / 100) * h + offsets[ia].y));
-        line.setAttribute("x2", String((nodes[ib].x / 100) * w + offsets[ib].x));
-        line.setAttribute("y2", String((nodes[ib].y / 100) * h + offsets[ib].y));
+        line.setAttribute("x1", String((experiments[ia].x / 100) * w + offsets[ia].x));
+        line.setAttribute("y1", String((experiments[ia].y / 100) * h + offsets[ia].y));
+        line.setAttribute("x2", String((experiments[ib].x / 100) * w + offsets[ib].x));
+        line.setAttribute("y2", String((experiments[ib].y / 100) * h + offsets[ib].y));
       });
     };
 
@@ -91,7 +86,7 @@ export function Laboratory({
       io.disconnect();
       cancelAnimationFrame(raf);
     };
-  }, [nodes, edges]);
+  }, [experiments, edges]);
 
   return (
     <Section id="laboratory" title="Laboratory">
@@ -110,28 +105,28 @@ export function Laboratory({
           ))}
         </svg>
 
-        {nodes.map((n, i) => (
+        {experiments.map((e, i) => (
           // wrapper : flottement en transform (GPU), aucune re-disposition
           <div
-            key={n.id}
+            key={e.id}
             ref={(el) => {
               nodeRefs.current[i] = el;
             }}
             className="absolute will-change-transform"
-            style={{ left: `${n.x}%`, top: `${n.y}%`, transform: "translate(-50%, -50%)" }}
+            style={{ left: `${e.x}%`, top: `${e.y}%`, transform: "translate(-50%, -50%)" }}
           >
-            <LabBubble node={n} onClick={() => open(n.projectId)} whileHover={{ scale: 1.1 }} />
+            <LabBubble experiment={e} onClick={() => onOpen(e)} whileHover={{ scale: 1.1 }} />
           </div>
         ))}
       </div>
 
       {/* Mobile : mêmes bulles, empilées et reliées verticalement */}
       <div className="flex flex-col items-center md:hidden">
-        {nodes.map((n, i) => (
-          <div key={n.id} className="flex flex-col items-center">
+        {experiments.map((e, i) => (
+          <div key={e.id} className="flex flex-col items-center">
             <LabBubble
-              node={n}
-              onClick={() => open(n.projectId)}
+              experiment={e}
+              onClick={() => onOpen(e)}
               initial={{ opacity: 0, y: 12 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -144,7 +139,7 @@ export function Laboratory({
               }}
             />
             {/* ligne verticale entre chaque bulle */}
-            {i < nodes.length - 1 && <span className="h-8 w-px bg-line" />}
+            {i < experiments.length - 1 && <span className="h-8 w-px bg-line" />}
           </div>
         ))}
       </div>

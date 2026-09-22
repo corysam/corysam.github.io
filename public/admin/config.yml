@@ -29,12 +29,64 @@ collections:
         options: ["Delivered", "In development"]
       - { name: role, label: Rôle, widget: string, required: false }
       - { name: order, label: Ordre d'affichage, widget: number, value_type: int, default: 999 }
-      - { name: lab, label: Projet Laboratory, widget: boolean, default: false }
       - { name: description, label: Description courte, widget: text, required: false }
       - { name: mission, label: Mission, widget: text, required: false }
       - { name: problem, label: Problème, widget: text, required: false }
       - { name: method, label: Méthode, widget: text, required: false }
       - { name: result, label: Résultat, widget: text, required: false }
+      - name: links
+        label: Liens
+        widget: list
+        required: false
+        fields:
+          - { name: label, label: Libellé, widget: string }
+          - { name: href, label: URL, widget: string }
+      - name: images
+        label: Images
+        widget: list
+        required: false
+        field: { name: image, label: Image, widget: image }
+
+  - name: experiments
+    label: Expériences
+    label_singular: Expérience
+    folder: content/experiments
+    extension: md
+    create: true
+    # Le nom de fichier est l'`id` que dérive lib/content.ts — et l'identifiant
+    # utilisé par les liaisons du Laboratory.
+    identifier_field: name
+    slug: "{{slug}}"
+    fields:
+      - { name: name, label: Nom, widget: string }
+      - name: label
+        label: Texte de la bulle (défaut : le nom)
+        widget: string
+        required: false
+      - { name: category, label: Catégorie, widget: string, required: false }
+      - name: accent
+        label: Couleur de la bulle
+        widget: select
+        options: [green, cyan, yellow, red, violet]
+        default: violet
+      - { name: x, label: Position X (%), widget: number, value_type: int, default: 50 }
+      - { name: y, label: Position Y (%), widget: number, value_type: int, default: 50 }
+      - { name: order, label: Ordre d'affichage, widget: number, value_type: int, default: 999 }
+      - name: status
+        label: Statut
+        widget: select
+        required: false
+        options: ["Prototype", "Ongoing", "Paused", "Abandoned"]
+      - { name: year, label: Année, widget: string, required: false }
+      - { name: description, label: Description courte, widget: text, required: false }
+      - { name: idea, label: L'idée de départ, widget: text, required: false }
+      - { name: learnings, label: Ce que ça m'a appris, widget: text, required: false }
+      - { name: nextSteps, label: Ce qu'il resterait à faire, widget: text, required: false }
+      - name: tech
+        label: Technologies
+        widget: list
+        required: false
+        field: { name: item, label: Technologie, widget: string }
       - name: links
         label: Liens
         widget: list
@@ -112,32 +164,27 @@ collections:
               - { name: text, label: Texte, widget: text }
 
       - name: lab
-        label: Laboratory
+        label: Laboratory (liaisons)
         file: content/lab.json
         fields:
-          - name: nodes
-            label: Bulles
+          # Les bulles vivent maintenant dans la collection « Expériences » :
+          # ce fichier ne garde que les traits qui les relient.
+          - name: edges
+            label: Liaisons entre expériences
             widget: list
+            required: false
             fields:
-              - { name: id, label: Identifiant, widget: string }
-              - { name: label, label: Libellé, widget: string }
-              - { name: category, label: Catégorie, widget: string }
-              - name: accent
-                label: Couleur
-                widget: select
-                options: [green, cyan, yellow, red, violet]
-              - { name: x, label: Position X (%), widget: number, value_type: int }
-              - { name: y, label: Position Y (%), widget: number, value_type: int }
-              - name: projectId
-                label: Projet ouvert par la bulle
+              - name: from
+                label: De
                 widget: relation
-                collection: projects
+                collection: experiments
                 search_fields: [name]
                 display_fields: [name]
                 value_field: "{{slug}}"
-          - name: edges
-            label: Liaisons entre bulles
-            widget: list
-            fields:
-              - { name: from, label: De (identifiant de bulle), widget: string }
-              - { name: to, label: Vers (identifiant de bulle), widget: string }
+              - name: to
+                label: Vers
+                widget: relation
+                collection: experiments
+                search_fields: [name]
+                display_fields: [name]
+                value_field: "{{slug}}"

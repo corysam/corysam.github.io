@@ -1,9 +1,18 @@
 import { describe, expect, it } from "vitest";
-import { ACCENT_COLORS, NEUTRAL_COLOR, STATUS_ACCENT, mix, statusColor } from "@/lib/types";
-import type { AccentName, ProjectStatus } from "@/lib/types";
+import {
+  ACCENT_COLORS,
+  EXPERIMENT_STATUS_ACCENT,
+  NEUTRAL_COLOR,
+  STATUS_ACCENT,
+  experimentStatusColor,
+  mix,
+  statusColor,
+} from "@/lib/types";
+import type { AccentName, ExperimentStatus, ProjectStatus } from "@/lib/types";
 
 const ACCENTS: AccentName[] = ["green", "cyan", "yellow", "red", "violet"];
 const STATUSES: ProjectStatus[] = ["Delivered", "In development"];
+const EXPERIMENT_STATUSES: ExperimentStatus[] = ["Prototype", "Ongoing", "Paused", "Abandoned"];
 
 describe("couleurs (régression audit D2)", () => {
   it("chaque accent pointe vers une variable CSS du thème", () => {
@@ -37,5 +46,26 @@ describe("couleurs (régression audit D2)", () => {
       "color-mix(in srgb, var(--color-status-green) 33%, transparent)"
     );
     expect(mix("rgb(0 0 0)", 8)).toBe("color-mix(in srgb, rgb(0 0 0) 8%, transparent)");
+  });
+});
+
+// Une expérience a ses propres statuts : « Prototype » n'a pas de sens pour un
+// projet client, et « Delivered » n'en a pas pour un bac à sable.
+describe("couleurs des statuts d'expérience", () => {
+  it("chaque statut d'expérience connu a une couleur résolue", () => {
+    for (const s of EXPERIMENT_STATUSES) {
+      expect(experimentStatusColor(s)).toMatch(/^var\(--color-status-/);
+    }
+  });
+
+  it("distingue les statuts entre eux", () => {
+    expect(EXPERIMENT_STATUS_ACCENT.Prototype).toBe("violet");
+    expect(EXPERIMENT_STATUS_ACCENT.Abandoned).toBe("red");
+    expect(experimentStatusColor("Paused")).toBe(ACCENT_COLORS.yellow);
+  });
+
+  it("retombe sur une couleur neutre pour un statut libre ou vide", () => {
+    expect(experimentStatusColor("Enterré")).toBe(NEUTRAL_COLOR);
+    expect(experimentStatusColor("")).toBe(NEUTRAL_COLOR);
   });
 });

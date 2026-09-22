@@ -56,17 +56,25 @@ if (fs.existsSync(profilePath)) {
   }
 }
 
-// 3. Laboratory : plusieurs bulles pointant vers le même projet (audit D3).
+// 3. Laboratory : une liaison vers une expérience inexistante est ignorée
+// silencieusement au build — le trait attendu n'apparaît jamais.
+const experimentsDir = path.join(contentDir, "experiments");
+const experimentIds = fs.existsSync(experimentsDir)
+  ? fs
+      .readdirSync(experimentsDir)
+      .filter((f) => f.endsWith(".md"))
+      .map((f) => f.replace(/\.md$/, ""))
+  : [];
+
 const labPath = path.join(contentDir, "lab.json");
 if (fs.existsSync(labPath)) {
   const lab = JSON.parse(fs.readFileSync(labPath, "utf8"));
-  const byProject = new Map();
-  for (const n of lab.nodes ?? []) {
-    byProject.set(n.projectId, [...(byProject.get(n.projectId) ?? []), n.id]);
-  }
-  for (const [projectId, ids] of byProject) {
-    if (ids.length > 1) {
-      report("content/lab.json", `bulles ${ids.join(", ")} ouvrent toutes "${projectId}"`);
+  for (const [i, edge] of (lab.edges ?? []).entries()) {
+    for (const end of ["from", "to"]) {
+      const id = String(edge?.[end] ?? "").trim();
+      if (!experimentIds.includes(id)) {
+        report("content/lab.json", `edges[${i}].${end} : expérience "${id}" introuvable — liaison ignorée`);
+      }
     }
   }
 }
@@ -118,6 +126,41 @@ if (fs.existsSync(projectsDir)) {
     for (const [i, link] of (Array.isArray(data.links) ? data.links : []).entries()) {
       if (!String(link?.label ?? "").trim() || !String(link?.href ?? "").trim()) {
         report(rel, `links[${i}] incomplet (label + href requis) — lien masqué`);
+      }
+    }
+  }
+}
+
+// 6. Expériences : mêmes trous que les projets, plus la bulle du Laboratory.
+const EXPERIMENT_FIELDS = ["name", "category", "status", "year", "description", "idea", "learnings"];
+const KNOWN_EXPERIMENT_STATUSES = ["Prototype", "Ongoing", "Paused", "Abandoned"];
+const ACCENTS = ["green", "cyan", "yellow", "red", "violet"];
+
+if (fs.existsSync(experimentsDir)) {
+  for (const file of fs.readdirSync(experimentsDir).filter((f) => f.endsWith(".md"))) {
+    const rel = path.join("content", "experiments", file);
+    const { data } = matter(fs.readFileSync(path.join(experimentsDir, file), "utf8"));
+
+    const empty = EXPERIMENT_FIELDS.filter((f) => String(data[f] ?? "").trim() === "");
+    if (empty.length > 0) report(rel, `champ(s) encore vide(s) : ${empty.join(", ")}`);
+
+    const status = String(data.status ?? "").trim();
+    if (status !== "" && !KNOWN_EXPERIMENT_STATUSES.includes(status)) {
+      report(rel, `status "${status}" sans couleur dédiée — pastille neutre (connus : ${KNOWN_EXPERIMENT_STATUSES.join(" | ")})`);
+    }
+
+    const accent = String(data.accent ?? "").trim();
+    if (accent !== "" && !ACCENTS.includes(accent)) {
+      report(rel, `accent "${accent}" inconnu — la bulle retombe sur violet (connus : ${ACCENTS.join(" | ")})`);
+    }
+
+    // Hors de 0-100, la bulle sort du cadre du graphe et devient inatteignable.
+    for (const axis of ["x", "y"]) {
+      const value = data[axis];
+      if (value === undefined || value === null || value === "") continue;
+      const n = Number(value);
+      if (!Number.isFinite(n) || n < 0 || n > 100) {
+        report(rel, `${axis} = ${value} : position hors du cadre (0-100)`);
       }
     }
   }

@@ -23,25 +23,47 @@ export type Project = {
   method: string;
   result: string;
   order: number;
-  /** Projet du Laboratory : exclu de la grille "Project", ouvert via les bulles. */
-  lab: boolean;
   links: ProjectLink[];
   images: string[];
 };
 
 export type AccentName = "green" | "cyan" | "yellow" | "red" | "violet";
 
-export type LabNode = {
+/** Statuts d'expérience dotés d'une couleur dédiée. */
+export type KnownExperimentStatus = "Prototype" | "Ongoing" | "Paused" | "Abandoned";
+
+/** Comme pour les projets, un statut libre reste affiché tel quel. */
+export type ExperimentStatus = KnownExperimentStatus | (string & {});
+
+/**
+ * Petit projet personnel inachevé, présenté dans le Laboratory. Le fichier
+ * porte à la fois la fiche (name, idea, learnings…) et sa bulle dans le graphe
+ * (label, category, accent, x, y) : une expérience = un fichier.
+ */
+export type Experiment = {
   id: string;
+  name: string;
+  /** Texte court de la bulle — retombe sur `name` quand il est absent. */
   label: string;
   category: string;
   accent: AccentName;
+  /** Position de la bulle en % du conteneur. */
   x: number;
   y: number;
-  projectId: string;
+  order: number;
+  status: ExperimentStatus;
+  year: string;
+  description: string;
+  idea: string;
+  learnings: string;
+  nextSteps: string;
+  tech: string[];
+  links: ProjectLink[];
+  images: string[];
 };
 
-export type Lab = { nodes: LabNode[]; edges: [string, string][] };
+/** Le graphe du Laboratory : les bulles et les traits qui les relient. */
+export type Lab = { experiments: Experiment[]; edges: [string, string][] };
 
 export type StackRow = { label: string; accent: AccentName; items: string[] };
 
@@ -84,6 +106,14 @@ export const STATUS_ACCENT: Record<KnownProjectStatus, AccentName> = {
   "In development": "cyan",
 };
 
+/** Même principe pour les expériences : la couleur dérive du statut. */
+export const EXPERIMENT_STATUS_ACCENT: Record<KnownExperimentStatus, AccentName> = {
+  Prototype: "violet",
+  Ongoing: "cyan",
+  Paused: "yellow",
+  Abandoned: "red",
+};
+
 /** Couleurs de marque des plateformes de recommandation. */
 export const SOURCE_COLORS: Record<RecommendationSource, string> = {
   linkedin: "var(--color-brand-linkedin)",
@@ -95,6 +125,11 @@ export const NEUTRAL_COLOR = "var(--color-muted)";
 
 export const statusColor = (status: ProjectStatus) => {
   const accent = STATUS_ACCENT[status as KnownProjectStatus];
+  return accent ? ACCENT_COLORS[accent] : NEUTRAL_COLOR;
+};
+
+export const experimentStatusColor = (status: ExperimentStatus) => {
+  const accent = EXPERIMENT_STATUS_ACCENT[status as KnownExperimentStatus];
   return accent ? ACCENT_COLORS[accent] : NEUTRAL_COLOR;
 };
 

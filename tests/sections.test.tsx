@@ -8,7 +8,7 @@ import { Stack } from "@/components/Stack";
 import { Recommendations } from "@/components/Recommendations";
 import { Navbar } from "@/components/Navbar";
 import { SECTIONS } from "@/lib/sections";
-import { gridProject, lab, labProjectA, labProjectB, profile, recommendations, stack } from "./fixtures";
+import { gridProject, lab, profile, recommendations, stack } from "./fixtures";
 
 /** Reproduit la composition de app/page.tsx, sans le chargement serveur. */
 const renderPage = () =>
@@ -17,7 +17,7 @@ const renderPage = () =>
       <Navbar />
       <Hero profile={profile} />
       <About paragraphs={profile.about} expertises={profile.expertises} />
-      <Showcase projects={[gridProject, labProjectA, labProjectB]} lab={lab} />
+      <Showcase projects={[gridProject]} lab={lab} />
       <Stack rows={stack} />
       <Recommendations items={recommendations} />
     </>

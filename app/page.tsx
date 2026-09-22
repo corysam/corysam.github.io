@@ -5,14 +5,21 @@ import { Showcase } from "@/components/Showcase";
 import { Stack } from "@/components/Stack";
 import { Recommendations } from "@/components/Recommendations";
 import { Footer } from "@/components/Footer";
-import { getLab, getProfile, getProjects, getRecommendations, getStack } from "@/lib/content";
+import {
+  getExperiments,
+  getLab,
+  getProfile,
+  getProjects,
+  getRecommendations,
+  getStack,
+} from "@/lib/content";
 
 // Composant serveur : tout le contenu est lu dans content/ au moment du build
 // et arrive pré-rendu dans le HTML statique.
 export default function Home() {
   const profile = getProfile();
   const projects = getProjects();
-  const lab = getLab(projects);
+  const lab = getLab(getExperiments());
   const stack = getStack();
   const recommendations = getRecommendations();
 
