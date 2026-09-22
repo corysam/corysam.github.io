@@ -3,7 +3,6 @@ name: Outil de reporting — Nantes Métropole
 status: Delivered
 role: Développeur Java (mission Daveo)
 order: 5
-lab: false
 description: Un outil Java de collecte de données via l'API Microsoft, couplé à Eclipse BIRT pour la visualisation.
 mission: Donner à la collectivité un moyen fiable d'extraire des données depuis l'écosystème Microsoft et de les restituer sous forme de rapports exploitables.
 problem: Les données nécessaires étaient dispersées et accessibles uniquement via l'API REST Microsoft. Aucune chaîne existante ne permettait de les consolider ni de vérifier que le projet était techniquement viable.

@@ -3,7 +3,6 @@ name: Agents d'automatisation IA — Data Inceptio
 status: Delivered
 role: Développeur agents IA freelance
 order: 2
-lab: false
 description: Conception d'agents IA et de workflows automatisés pour remplacer des processus manuels répétitifs.
 mission: Réduire la charge de travail manuelle d'une agence de données en confiant à des agents LLM les tâches de traitement, d'enrichissement et de routage d'informations qui mobilisaient l'équipe au quotidien.
 problem: Des processus métier répétitifs, éclatés entre plusieurs outils, dépendaient d'interventions humaines pour des décisions simples. Chaque étape manuelle ajoutait du délai et des erreurs.

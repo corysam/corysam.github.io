@@ -3,7 +3,6 @@ name: Outils internes QA — Datasolution
 status: Delivered
 role: Développeur fullstack
 order: 7
-lab: false
 description: Outils sur mesure pour l'équipe QA et un prototype de dashboard Grafana.
 mission: >-
   Outiller le département qualité pour accélérer ses contrôles et rendre ses

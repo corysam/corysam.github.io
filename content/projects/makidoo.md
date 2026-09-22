@@ -3,7 +3,6 @@ name: Makidoo — plateforme white-label
 status: Delivered
 role: Développeur fullstack, référent technique
 order: 4
-lab: false
 description: Une application vidéo en marque blanche, servant plusieurs marques clientes depuis une seule base de code.
 mission: Permettre à Dream And Achieve de déployer son produit Makidoo sous l'identité de chaque client, sans dupliquer le code ni multiplier les environnements à maintenir.
 problem: Chaque nouveau client demandait des adaptations visuelles et fonctionnelles. Sans architecture dédiée, ces variations se transformaient en forks difficiles à synchroniser et en dette technique.
