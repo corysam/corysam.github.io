@@ -19,5 +19,4 @@ result: >-
   des données, première brique d'un suivi continu.
 links: []
 images:
-  - /projects/datasolution-1.png
 ---
