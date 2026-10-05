@@ -60,7 +60,7 @@ collections:
     fields:
       - { name: name, label: Nom, widget: string }
       - name: label
-        label: Texte de la bulle (défaut : le nom)
+        label: "Texte de la bulle (défaut : le nom)"
         widget: string
         required: false
       - { name: category, label: Catégorie, widget: string, required: false }
