@@ -1,3 +1,19 @@
 {
-  "edges": []
+  "nodes": [
+    { "id": "n1", "label": "Portfolio", "category": "Application", "accent": "cyan", "x": 22, "y": 72, "projectId": "lab-portfolio" },
+    { "id": "n2", "label": "Agent loop", "category": "IA", "accent": "violet", "x": 22, "y": 28, "projectId": "lab-agent-loop" },
+    { "id": "n3", "label": "Hybrid search", "category": "IA", "accent": "violet", "x": 50, "y": 16, "projectId": "lab-hybrid-search" },
+    { "id": "n4", "label": "Evals", "category": "IA", "accent": "violet", "x": 80, "y": 30, "projectId": "lab-evals" },
+    { "id": "n5", "label": "MCP", "category": "IA", "accent": "violet", "x": 78, "y": 72, "projectId": "lab-mcp-server" },
+    { "id": "n6", "label": "Assistant RAG", "category": "IA", "accent": "violet", "x": 50, "y": 50, "projectId": "lab-portfolio-assistant" }
+  ],
+  "edges": [
+    { "from": "n2", "to": "n6" },
+    { "from": "n3", "to": "n6" },
+    { "from": "n4", "to": "n6" },
+    { "from": "n5", "to": "n6" },
+    { "from": "n1", "to": "n6" },
+    { "from": "n2", "to": "n5" },
+    { "from": "n3", "to": "n4" }
+  ]
 }
