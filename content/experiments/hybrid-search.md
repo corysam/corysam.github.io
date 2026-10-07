@@ -3,8 +3,6 @@ name: Recherche hybride pgvector
 label: Hybrid search
 category: IA
 accent: violet
-x: 50
-y: 16
 order: 3
 status: Planned
 year: "2026"

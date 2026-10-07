@@ -4,6 +4,7 @@
 import fs from "fs";
 import path from "path";
 import matter from "gray-matter";
+import { layoutLab } from "./layout";
 import type { AccentName, Experiment, Lab, Profile, Project, ProjectLink, Recommendation, StackRow } from "./types";
 
 /** Racine du contenu. Paramétrable pour permettre de tester sur des fixtures. */
@@ -95,18 +96,11 @@ function toAccent(value: unknown): AccentName {
   return ACCENTS.includes(accent) ? accent : "violet";
 }
 
-function toPercent(value: unknown, fallback: number): number {
+/** Position manuelle en % — absente ou invalide, la bulle est placée automatiquement. */
+function toPercent(value: unknown): number | undefined {
+  if (value === null || value === undefined || value === "") return undefined;
   const n = typeof value === "string" ? Number(value) : value;
-  return typeof n === "number" && Number.isFinite(n) ? n : fallback;
-}
-
-/**
- * Position de repli d'une bulle sans x/y : sur un cercle plutôt qu'en (0,0),
- * pour qu'une expérience tout juste créée ne se superpose pas aux autres.
- */
-function fallbackPosition(index: number, total: number) {
-  const angle = (index / Math.max(total, 1)) * 2 * Math.PI - Math.PI / 2;
-  return { x: 50 + Math.cos(angle) * 32, y: 50 + Math.sin(angle) * 30 };
+  return typeof n === "number" && Number.isFinite(n) ? n : undefined;
 }
 
 function toTech(value: unknown): string[] {
@@ -122,11 +116,10 @@ export function getExperiments(contentDir: string = defaultContentDir()): Experi
   const files = fs.readdirSync(dir).filter((f) => f.endsWith(".md"));
 
   return files
-    .map((file, i) => {
+    .map((file) => {
       const id = file.replace(/\.md$/, "");
       const { data } = matter(fs.readFileSync(path.join(dir, file), "utf8"));
       const name = text(data.name) || nameFromId(id);
-      const spread = fallbackPosition(i, files.length);
 
       return {
         id,
@@ -135,8 +128,8 @@ export function getExperiments(contentDir: string = defaultContentDir()): Experi
         label: text(data.label) || name,
         category: text(data.category),
         accent: toAccent(data.accent),
-        x: toPercent(data.x, spread.x),
-        y: toPercent(data.y, spread.y),
+        x: toPercent(data.x),
+        y: toPercent(data.y),
         order: toOrder(data.order),
         status: text(data.status),
         year: text(data.year),
@@ -174,7 +167,7 @@ export function getLab(experiments: Experiment[], contentDir: string = defaultCo
       return valid;
     });
 
-  return { experiments, edges };
+  return { experiments: layoutLab(experiments, edges), edges };
 }
 
 export function getStack(contentDir: string = defaultContentDir()): StackRow[] {

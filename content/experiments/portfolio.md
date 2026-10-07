@@ -3,8 +3,6 @@ name: Portfolio
 label: Portfolio
 category: Application
 accent: cyan
-x: 22
-y: 72
 order: 1
 status: Ongoing
 year: "2026"

@@ -69,8 +69,10 @@ collections:
         widget: select
         options: [green, cyan, yellow, red, violet]
         default: violet
-      - { name: x, label: Position X (%), widget: number, value_type: int, default: 50 }
-      - { name: y, label: Position Y (%), widget: number, value_type: int, default: 50 }
+      # Vide = placement automatique selon les liaisons et la catégorie
+      # (lib/layout.ts). Renseignées, elles épinglent la bulle à cet endroit.
+      - { name: x, label: "Position X (%) — vide = automatique", widget: number, value_type: int, required: false }
+      - { name: y, label: "Position Y (%) — vide = automatique", widget: number, value_type: int, required: false }
       - { name: order, label: Ordre d'affichage, widget: number, value_type: int, default: 999 }
       - name: status
         label: Statut

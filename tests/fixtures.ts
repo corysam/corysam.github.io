@@ -1,4 +1,4 @@
-import type { Experiment, Lab, Profile, Project, Recommendation, StackRow } from "@/lib/types";
+import type { Lab, PlacedExperiment, Profile, Project, Recommendation, StackRow } from "@/lib/types";
 
 // Contenu de test volontairement indépendant de content/ : les tests doivent
 // rester verts quand le vrai contenu du portfolio change.
@@ -21,7 +21,7 @@ export const makeProject = (over: Partial<Project> = {}): Project => ({
 
 export const gridProject = makeProject({ id: "alpha", name: "Alpha" });
 
-export const makeExperiment = (over: Partial<Experiment> = {}): Experiment => ({
+export const makeExperiment = (over: Partial<PlacedExperiment> = {}): PlacedExperiment => ({
   id: "lab-a",
   name: "Automates cellulaires",
   label: "Automata",

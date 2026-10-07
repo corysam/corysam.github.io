@@ -3,8 +3,6 @@ name: Serveur MCP
 label: MCP
 category: IA
 accent: violet
-x: 78
-y: 72
 order: 5
 status: Planned
 year: "2026"

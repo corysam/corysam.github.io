@@ -3,8 +3,6 @@ name: Harness d'évaluation
 label: Evals
 category: IA
 accent: violet
-x: 80
-y: 30
 order: 4
 status: Planned
 year: "2026"

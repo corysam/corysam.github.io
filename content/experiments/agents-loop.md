@@ -3,8 +3,6 @@ name: Boucle d'agent from scratch
 label: Agent loop
 category: IA
 accent: violet
-x: 22
-y: 28
 order: 2
 status: Planned
 year: "2026"

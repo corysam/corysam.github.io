@@ -47,9 +47,12 @@ export type Experiment = {
   label: string;
   category: string;
   accent: AccentName;
-  /** Position de la bulle en % du conteneur. */
-  x: number;
-  y: number;
+  /**
+   * Position manuelle de la bulle en % du conteneur : elle épingle la bulle.
+   * Absente, la bulle est placée automatiquement (lib/layout.ts).
+   */
+  x?: number;
+  y?: number;
   order: number;
   status: ExperimentStatus;
   year: string;
@@ -62,8 +65,11 @@ export type Experiment = {
   images: string[];
 };
 
+/** Expérience dont la bulle a une position, manuelle ou calculée. */
+export type PlacedExperiment = Experiment & { x: number; y: number };
+
 /** Le graphe du Laboratory : les bulles et les traits qui les relient. */
-export type Lab = { experiments: Experiment[]; edges: [string, string][] };
+export type Lab = { experiments: PlacedExperiment[]; edges: [string, string][] };
 
 export type StackRow = { label: string; accent: AccentName; items: string[] };
 

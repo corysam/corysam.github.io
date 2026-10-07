@@ -250,19 +250,17 @@ describe("getExperiments", () => {
     expect(getExperiments(dir).map((e) => e.accent)).toEqual(["violet", "violet"]);
   });
 
-  // Sans position, toutes les bulles se superposeraient en haut à gauche.
-  it("répartit les bulles sans position au lieu de les empiler", () => {
+  // Sans position, la bulle est placée par getLab : le loader ne doit pas
+  // inventer une position qui l'épinglerait.
+  it("laisse x/y vides quand la position est absente ou invalide", () => {
     const dir = makeContentDir({
       "experiments/a.md": experimentMd({ name: "A", x: undefined, y: undefined, order: 1 }),
-      "experiments/b.md": experimentMd({ name: "B", x: undefined, y: undefined, order: 2 }),
+      "experiments/b.md": experimentMd({ name: "B", x: "abc", y: "", order: 2 }),
     });
 
-    const [a, b] = getExperiments(dir);
-
-    expect([a.x, a.y]).not.toEqual([b.x, b.y]);
-    for (const v of [a.x, a.y, b.x, b.y]) {
-      expect(v).toBeGreaterThanOrEqual(0);
-      expect(v).toBeLessThanOrEqual(100);
+    for (const e of getExperiments(dir)) {
+      expect(e.x).toBeUndefined();
+      expect(e.y).toBeUndefined();
     }
   });
 
@@ -344,6 +342,26 @@ describe("getLab", () => {
 
     expect(lab.edges).toEqual([["lab-a", "lab-a"]]);
     expect(warn).toHaveBeenCalledWith(expect.stringContaining("fantome"));
+  });
+
+  // Sans position, toutes les bulles se superposeraient en haut à gauche.
+  it("place les bulles sans position, dans le cadre et sans les empiler", () => {
+    const dir = makeContentDir({
+      "experiments/a.md": experimentMd({ name: "A", x: undefined, y: undefined, order: 1 }),
+      "experiments/b.md": experimentMd({ name: "B", x: undefined, y: undefined, order: 2 }),
+      "experiments/c.md": experimentMd({ name: "C", x: 30, y: 40, order: 3 }),
+      "lab.json": JSON.stringify({ edges: [{ from: "a", to: "b" }] }),
+    });
+
+    const [a, b, c] = getLab(experiments(dir), dir).experiments;
+
+    expect([a.x, a.y]).not.toEqual([b.x, b.y]);
+    for (const v of [a.x, a.y, b.x, b.y]) {
+      expect(v).toBeGreaterThanOrEqual(0);
+      expect(v).toBeLessThanOrEqual(100);
+    }
+    // Une position manuelle reste prioritaire.
+    expect([c.x, c.y]).toEqual([30, 40]);
   });
 
   // Les bulles vivent maintenant dans content/experiments/ : le graphe doit

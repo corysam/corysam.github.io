@@ -3,8 +3,6 @@ name: Assistant du portfolio
 label: Assistant RAG
 category: IA
 accent: violet
-x: 50
-y: 50
 order: 6
 status: Planned
 year: "2026"
