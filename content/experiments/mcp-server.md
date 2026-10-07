@@ -1,29 +1,25 @@
 ---
-name: Assistant du portfolio
-label: Assistant RAG
+name: Serveur MCP
+label: MCP
 category: IA
 accent: violet
-x: 50
-y: 50
-order: 6
+x: 78
+y: 72
+order: 5
 status: Planned
 year: "2026"
 description: >-
-  Un assistant qui répond aux questions sur mon parcours et mes projets, à
-  partir de mon CV et de ces fiches.
+  Exposer des outils à des agents via le Model Context Protocol.
 idea: >-
-  Assembler les expériences du labo en un vrai service de production :
-  mesuré, tracé, déployé, et directement testable par les visiteurs du site.
+  Rendre les capacités de l'assistant utilisables par n'importe quel client
+  compatible MCP, pas seulement par mon interface.
 learnings: >-
   [À remplir]
 nextSteps: >-
-  Publier le dépôt avec les résultats d'évaluation et un retour d'expérience
-  écrit.
+  Exposer la recherche documentaire de l'assistant comme outil MCP.
 tech:
   - TypeScript
-  - PostgreSQL
-  - pgvector
-  - Docker
+  - MCP
 links: []
 images: []
 ---
