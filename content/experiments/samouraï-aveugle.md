@@ -3,8 +3,8 @@ name: Samouraï Aveugle
 label: Samouraï Aveugle
 category: Game Dev
 accent: red
-x: 50
-y: 50
+x: null
+y: null
 order: 999
 status: Paused
 year: '2025'
