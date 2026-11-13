@@ -28,7 +28,7 @@ export default function Home() {
       <Navbar />
       <main>
         <Hero profile={profile} />
-        <About paragraphs={profile.about} expertises={profile.expertises} />
+        <About paragraphs={profile.about} expertises={profile.expertises} photo={profile.photo} />
         <Showcase projects={projects} lab={lab} />
         <Stack rows={stack} />
         <Recommendations items={recommendations} />

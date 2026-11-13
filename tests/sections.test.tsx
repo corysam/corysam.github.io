@@ -58,6 +58,18 @@ describe("Sections — contenu", () => {
     for (const e of profile.expertises) expect(screen.getByText(e)).toBeInTheDocument();
   });
 
+  it("About affiche la photo quand elle est renseignée", () => {
+    render(<About paragraphs={profile.about} expertises={profile.expertises} photo="/photo.jpg" />);
+    expect(screen.getByRole("img")).toHaveAttribute("src", "/photo.jpg");
+  });
+
+  it("About garde le cadre vide sans photo (champ absent ou vidé dans le CMS)", () => {
+    const { rerender } = render(<About paragraphs={profile.about} expertises={profile.expertises} />);
+    expect(screen.queryByRole("img")).not.toBeInTheDocument();
+    rerender(<About paragraphs={profile.about} expertises={profile.expertises} photo="" />);
+    expect(screen.queryByRole("img")).not.toBeInTheDocument();
+  });
+
   // Régression audit M3 : la section affichait des ronds vides au lieu du vrai stack.
   it("Stack rend les technologies du contenu, pas des ronds vides", () => {
     render(<Stack rows={stack} />);

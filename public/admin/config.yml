@@ -124,6 +124,10 @@ collections:
             label: CV (PDF, déposé dans public/)
             widget: file
             required: false
+          - name: photo
+            label: Photo « À propos » (déposée dans public/, format portrait 4:5 idéal)
+            widget: image
+            required: false
           - name: about
             label: Paragraphes « À propos »
             widget: list

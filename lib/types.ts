@@ -92,6 +92,8 @@ export type Profile = {
   linkedin: string;
   /** Chemin vers le CV dans public/ (ex: "/resume.pdf") ou null pour masquer le bouton. */
   resume: string | null;
+  /** Photo de la section « À propos », déposée dans public/ (ex: "/photo.jpg"). Absente = cadre vide. */
+  photo?: string | null;
   about: string[];
   expertises: string[];
 };
