@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import { Section } from "./Section";
 import { LabBubble } from "./LabBubble";
+import { useI18n } from "./I18nProvider";
 import type { Experiment, Lab } from "@/lib/types";
 
 export function Laboratory({
@@ -15,6 +16,7 @@ export function Laboratory({
   // Une expérience porte à la fois sa fiche et sa bulle : plus d'indirection
   // entre un noeud du graphe et le contenu qu'il ouvre.
   const { experiments, edges } = lab;
+  const { t } = useI18n();
   const containerRef = useRef<HTMLDivElement>(null);
   const nodeRefs = useRef<(HTMLDivElement | null)[]>([]);
   const lineRefs = useRef<(SVGLineElement | null)[]>([]);
@@ -89,7 +91,7 @@ export function Laboratory({
   }, [experiments, edges]);
 
   return (
-    <Section id="laboratory" title="Laboratory">
+    <Section id="laboratory" title={t.titles.laboratory}>
       {/* Desktop : graphe de bulles connectées */}
       <div ref={containerRef} className="relative hidden h-[420px] w-full md:block">
         <svg className="absolute inset-0 h-full w-full">

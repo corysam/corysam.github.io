@@ -85,6 +85,26 @@ une enveloppe (`rows`, `items`, `{ from, to }`) pour que le CMS sache les adress
 C'est un détail de stockage : `lib/content.ts` la retire à la lecture et renvoie les
 mêmes types qu'avant.
 
+### Langues (français / anglais)
+
+Le site existe en deux versions statiques, `/fr/` et `/en/` (`app/[lang]/`). La racine
+`/` est une page vide qui redirige vers la langue choisie précédemment avec le bouton
+de langue de la navbar, sinon vers celle du navigateur (français si le navigateur est
+en français, anglais sinon).
+
+- **Textes de l'interface** (onglets, titres, libellés des fiches, aria-labels) :
+  `lib/i18n.ts`. Le dictionnaire anglais est typé sur le français, donc une clé oubliée
+  ne compile pas.
+- **Contenu** : le français est le fichier sans suffixe, l'anglais son jumeau
+  `*.en.md` / `*.en.json` (`makidoo.md` → `makidoo.en.md`, `profile.json` →
+  `profile.en.json`). Le fichier anglais ne contient que les textes. Ordre, statut,
+  couleurs, positions, images et URLs sont **toujours lus dans le français**.
+  Un texte absent de la traduction **retombe sur le français** : un projet tout juste
+  ajouté s'affiche donc déjà sur `/en/`, en français, en attendant sa traduction.
+- Dans le CMS, chaque fiche propose les deux langues côte à côte. Les champs non
+  traduisibles ne s'éditent qu'en français.
+- `npm run check:content` signale les traductions absentes ou incomplètes.
+
 ### Éditer sans checkout
 
 `/admin/` sert **Sveltia CMS** : une interface d'édition qui écrit directement dans

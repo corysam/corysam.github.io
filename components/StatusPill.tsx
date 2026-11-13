@@ -1,7 +1,12 @@
+"use client";
+
 import type { ProjectStatus } from "@/lib/types";
+import { statusLabel } from "@/lib/i18n";
+import { useI18n } from "./I18nProvider";
 import { mix, statusColor } from "@/lib/types";
 
 export function StatusPill({ status }: { status: ProjectStatus }) {
+  const { t } = useI18n();
   // Statut non renseigné : pas de pastille vide (contenu en cours de rédaction).
   if (!status) return null;
 
@@ -15,7 +20,7 @@ export function StatusPill({ status }: { status: ProjectStatus }) {
         backgroundColor: mix(color, 8),
       }}
     >
-      {status}
+      {statusLabel(t, status)}
     </span>
   );
 }

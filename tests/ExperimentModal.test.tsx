@@ -24,7 +24,7 @@ describe("ExperimentModal", () => {
     const e = makeExperiment();
     render(<ExperimentModal experiment={e} onClose={vi.fn()} />);
 
-    for (const label of ["Description", "Idea", "Learnings", "Next steps"]) {
+    for (const label of ["Description", "L'idée", "Ce que j'ai appris", "La suite"]) {
       expect(screen.getByText(label)).toBeInTheDocument();
     }
     expect(screen.getByText(e.idea)).toBeInTheDocument();
@@ -42,9 +42,9 @@ describe("ExperimentModal", () => {
       />
     );
 
-    expect(screen.getByText("Idea")).toBeInTheDocument();
-    expect(screen.queryByText("Learnings")).not.toBeInTheDocument();
-    expect(screen.queryByText("Next steps")).not.toBeInTheDocument();
+    expect(screen.getByText("L'idée")).toBeInTheDocument();
+    expect(screen.queryByText("Ce que j'ai appris")).not.toBeInTheDocument();
+    expect(screen.queryByText("La suite")).not.toBeInTheDocument();
   });
 
   it("situe l'expérience par sa catégorie et son année", () => {

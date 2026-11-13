@@ -389,6 +389,128 @@ describe("loaders JSON", () => {
   });
 });
 
+describe("traductions (fichiers *.en.*)", () => {
+  it("lit les textes de la traduction anglaise", () => {
+    const dir = makeContentDir({
+      "projects/a.md": projectMd({ name: "Alpha", mission: "Une mission." }),
+      "projects/a.en.md": projectMd({ name: "Alpha EN", mission: "A mission." }),
+    });
+
+    const [p] = getProjects(dir, "en");
+
+    expect(p.name).toBe("Alpha EN");
+    expect(p.mission).toBe("A mission.");
+    // Le français reste intact.
+    expect(getProjects(dir, "fr")[0].mission).toBe("Une mission.");
+  });
+
+  it("n'ajoute pas les traductions à la liste des projets", () => {
+    const dir = makeContentDir({
+      "projects/a.md": projectMd(),
+      "projects/a.en.md": projectMd(),
+    });
+    expect(getProjects(dir).map((p) => p.id)).toEqual(["a"]);
+    expect(getProjects(dir, "en").map((p) => p.id)).toEqual(["a"]);
+  });
+
+  it("retombe sur le français pour un champ ou un fichier non traduit", () => {
+    const dir = makeContentDir({
+      "projects/a.md": projectMd({ name: "A", order: 1, problem: "Un problème." }),
+      "projects/a.en.md": projectMd({ name: "A", problem: "" }),
+      "projects/b.md": projectMd({ name: "B", order: 2, mission: "Mission de B." }),
+    });
+
+    const [a, b] = getProjects(dir, "en");
+
+    expect(a.problem).toBe("Un problème.");
+    expect(b.mission).toBe("Mission de B.");
+  });
+
+  it("prend toujours les champs structurels dans le français", () => {
+    const dir = makeContentDir({
+      "projects/a.md": projectMd({
+        status: "Delivered",
+        order: 3,
+        images: ["/a.png"],
+        links: [{ label: "Site", href: "https://example.com/fr" }],
+      }),
+      "projects/a.en.md": projectMd({
+        status: "Abandoned",
+        order: 1,
+        images: ["/autre.png"],
+        links: [{ label: "Website", href: "https://example.com/en" }],
+      }),
+    });
+
+    const [p] = getProjects(dir, "en");
+
+    expect(p.status).toBe("Delivered");
+    expect(p.order).toBe(3);
+    expect(p.images).toEqual(["/a.png"]);
+    expect(p.links).toEqual([{ label: "Website", href: "https://example.com/fr" }]);
+  });
+
+  it("traduit les expériences sans toucher à la bulle", () => {
+    const dir = makeContentDir({
+      "experiments/a.md": experimentMd({ name: "Automates", category: "Simulation", accent: "cyan", x: 10 }),
+      "experiments/a.en.md": experimentMd({ name: "Automata", label: "", category: "Sim", idea: "A wish.", accent: "red", x: 90 }),
+    });
+
+    const [e] = getExperiments(dir, "en");
+
+    expect(e.name).toBe("Automata");
+    expect(e.category).toBe("Sim");
+    expect(e.idea).toBe("A wish.");
+    // label vide dans la traduction : le libellé court du français reste prioritaire sur le nom.
+    expect(e.label).toBe("Automata");
+    expect(e.accent).toBe("cyan");
+    expect(e.x).toBe(10);
+    expect(getExperiments(dir).map((x) => x.id)).toEqual(["a"]);
+  });
+
+  it("traduit profil, stack et recommandations en gardant la structure du français", () => {
+    const dir = makeContentDir({
+      "profile.json": JSON.stringify({
+        name: "Test",
+        email: "fr@example.com",
+        resume: null,
+        tagline: "Accroche.",
+        about: ["Paragraphe."],
+        expertises: ["Agents LLM"],
+      }),
+      "profile.en.json": JSON.stringify({ name: "Ignored", email: "en@example.com", tagline: "Tagline.", about: [], expertises: ["LLM agents"] }),
+      "stack.json": JSON.stringify({ rows: [{ label: "IA", accent: "cyan", items: ["n8n"] }] }),
+      "stack.en.json": JSON.stringify({ rows: [{ label: "AI", accent: "red", items: [] }] }),
+      "recommendations.json": JSON.stringify({ items: [{ id: "r1", source: "malt", name: "Alice", role: "Présidente", text: "Top." }] }),
+      "recommendations.en.json": JSON.stringify({ items: [{ id: "r1", source: "linkedin", name: "Bob", role: "President", text: "" }] }),
+    });
+
+    const profile = getProfile(dir, "en");
+    expect(profile.name).toBe("Test");
+    expect(profile.email).toBe("fr@example.com");
+    expect(profile.tagline).toBe("Tagline.");
+    expect(profile.about).toEqual(["Paragraphe."]);
+    expect(profile.expertises).toEqual(["LLM agents"]);
+
+    expect(getStack(dir, "en")).toEqual([{ label: "AI", accent: "cyan", items: ["n8n"] }]);
+
+    expect(getRecommendations(dir, "en")).toEqual([
+      { id: "r1", source: "malt", name: "Alice", role: "President", text: "Top." },
+    ]);
+  });
+
+  it("charge la version anglaise sans aucun fichier de traduction", () => {
+    const dir = makeContentDir({
+      "projects/a.md": projectMd(),
+      "stack.json": JSON.stringify({ rows: [{ label: "Back End", accent: "green", items: ["Node.js"] }] }),
+      "profile.json": JSON.stringify({ name: "Test", resume: null, about: ["Un."], expertises: [] }),
+    });
+    expect(getProjects(dir, "en")[0].mission).toBe("Une mission.");
+    expect(getStack(dir, "en")[0].label).toBe("Back End");
+    expect(getProfile(dir, "en").about).toEqual(["Un."]);
+  });
+});
+
 describe("contenu réel du dépôt", () => {
   // Garde-fou : le contenu livré doit toujours passer la validation.
   it("content/ est valide", () => {
@@ -399,5 +521,13 @@ describe("contenu réel du dépôt", () => {
     expect(() => getLab(getExperiments())).not.toThrow();
     expect(getStack().length).toBeGreaterThan(0);
     expect(getProfile().name).toBeTruthy();
+  });
+
+  // Une traduction manquante n'est qu'un avertissement de `check:content` : elle
+  // ne doit jamais bloquer le déploiement d'un projet tout juste ajouté au CMS.
+  it("la version anglaise se charge et liste les mêmes entrées", () => {
+    expect(getProjects(undefined, "en").map((p) => p.id)).toEqual(getProjects().map((p) => p.id));
+    expect(getExperiments(undefined, "en").map((e) => e.id)).toEqual(getExperiments().map((e) => e.id));
+    expect(getProfile(undefined, "en").about.length).toBeGreaterThan(0);
   });
 });

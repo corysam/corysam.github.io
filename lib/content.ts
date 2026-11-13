@@ -5,6 +5,7 @@ import fs from "fs";
 import path from "path";
 import matter from "gray-matter";
 import { layoutLab } from "./layout";
+import { DEFAULT_LOCALE, LOCALES, type Locale } from "./i18n";
 import type { AccentName, Experiment, Lab, Profile, Project, ProjectLink, Recommendation, StackRow } from "./types";
 
 /** Racine du contenu. Paramétrable pour permettre de tester sur des fixtures. */
@@ -12,6 +13,40 @@ const defaultContentDir = () => path.join(process.cwd(), "content");
 
 function readJson<T>(contentDir: string, file: string): T {
   return JSON.parse(fs.readFileSync(path.join(contentDir, file), "utf8")) as T;
+}
+
+// ---- Traductions -----------------------------------------------------------
+// Disposition Sveltia `multiple_files` : le français est le fichier sans suffixe
+// (`makidoo.md`, `profile.json`), l'anglais son jumeau suffixé (`makidoo.en.md`,
+// `profile.en.json`). Le fichier français reste la seule source des champs
+// structurels (ordre, couleurs, liens, images…) ; la traduction ne fournit que
+// les textes, et chaque texte manquant retombe sur le français. Une traduction
+// incomplète ne casse donc jamais la version anglaise.
+
+type Data = Record<string, unknown>;
+
+/** `makidoo.en.md` est la traduction de `makidoo.md`, pas un projet de plus. */
+const isTranslationFile = (file: string) =>
+  LOCALES.some((l) => l !== DEFAULT_LOCALE && file.endsWith(`.${l}.md`));
+
+/** Frontmatter de la traduction d'une entrée — vide en français ou tant qu'elle n'existe pas. */
+function readEntryTranslation(dir: string, id: string, locale: Locale): Data {
+  if (locale === DEFAULT_LOCALE) return {};
+  const file = path.join(dir, `${id}.${locale}.md`);
+  return fs.existsSync(file) ? matter(fs.readFileSync(file, "utf8")).data : {};
+}
+
+/** Traduction d'un fichier JSON (`profile.en.json`) — vide en français ou si absente. */
+function readJsonTranslation(contentDir: string, file: string, locale: Locale): Data {
+  if (locale === DEFAULT_LOCALE) return {};
+  const translated = path.join(contentDir, file.replace(/\.json$/, `.${locale}.json`));
+  return fs.existsSync(translated) ? (JSON.parse(fs.readFileSync(translated, "utf8")) as Data) : {};
+}
+
+/** Liste de textes traduite si elle contient au moins une entrée, sinon celle du français. */
+function translatedList(translated: unknown, base: string[]): string[] {
+  const list = Array.isArray(translated) ? translated.map(text).filter((item) => item !== "") : [];
+  return list.length > 0 ? list : base;
 }
 
 // ---- Normalisation du frontmatter ----------------------------------------
@@ -35,12 +70,16 @@ function nameFromId(id: string): string {
     .join(" ");
 }
 
-/** Seuls les liens ayant à la fois un libellé et une URL sont rendus. */
-function toLinks(value: unknown): ProjectLink[] {
+/**
+ * Seuls les liens ayant à la fois un libellé et une URL sont rendus. L'URL vient
+ * toujours du français ; le libellé de la traduction, au même rang, le remplace.
+ */
+function toLinks(value: unknown, translated?: unknown): ProjectLink[] {
   if (!Array.isArray(value)) return [];
+  const labels = Array.isArray(translated) ? translated : [];
   return value
-    .map((entry) => ({
-      label: text((entry as ProjectLink | null)?.label),
+    .map((entry, i) => ({
+      label: text((labels[i] as ProjectLink | null)?.label) || text((entry as ProjectLink | null)?.label),
       href: text((entry as ProjectLink | null)?.href),
     }))
     .filter((link) => link.label !== "" && link.href !== "");
@@ -57,27 +96,29 @@ function toOrder(value: unknown): number {
   return typeof n === "number" && Number.isFinite(n) ? n : 999;
 }
 
-export function getProjects(contentDir: string = defaultContentDir()): Project[] {
+export function getProjects(contentDir: string = defaultContentDir(), locale: Locale = DEFAULT_LOCALE): Project[] {
   const dir = path.join(contentDir, "projects");
   return fs
     .readdirSync(dir)
-    .filter((f) => f.endsWith(".md"))
+    .filter((f) => f.endsWith(".md") && !isTranslationFile(f))
     .map((file) => {
       const id = file.replace(/\.md$/, "");
       const { data } = matter(fs.readFileSync(path.join(dir, file), "utf8"));
+      const tr = readEntryTranslation(dir, id, locale);
+      const t = (key: string) => text(tr[key]) || text(data[key]);
 
       return {
         id,
-        name: text(data.name) || nameFromId(id),
+        name: t("name") || nameFromId(id),
         status: text(data.status),
-        role: text(data.role),
-        description: text(data.description),
-        mission: text(data.mission),
-        problem: text(data.problem),
-        method: text(data.method),
-        result: text(data.result),
+        role: t("role"),
+        description: t("description"),
+        mission: t("mission"),
+        problem: t("problem"),
+        method: t("method"),
+        result: t("result"),
         order: toOrder(data.order),
-        links: toLinks(data.links),
+        links: toLinks(data.links, tr.links),
         images: toImages(data.images),
       } satisfies Project;
     })
@@ -108,37 +149,39 @@ function toTech(value: unknown): string[] {
   return value.map(text).filter((item) => item !== "");
 }
 
-export function getExperiments(contentDir: string = defaultContentDir()): Experiment[] {
+export function getExperiments(contentDir: string = defaultContentDir(), locale: Locale = DEFAULT_LOCALE): Experiment[] {
   const dir = path.join(contentDir, "experiments");
   // Le dossier peut ne pas exister tant qu'aucune expérience n'est écrite.
   if (!fs.existsSync(dir)) return [];
 
-  const files = fs.readdirSync(dir).filter((f) => f.endsWith(".md"));
+  const files = fs.readdirSync(dir).filter((f) => f.endsWith(".md") && !isTranslationFile(f));
 
   return files
     .map((file) => {
       const id = file.replace(/\.md$/, "");
       const { data } = matter(fs.readFileSync(path.join(dir, file), "utf8"));
-      const name = text(data.name) || nameFromId(id);
+      const tr = readEntryTranslation(dir, id, locale);
+      const t = (key: string) => text(tr[key]) || text(data[key]);
+      const name = t("name") || nameFromId(id);
 
       return {
         id,
         name,
         // La bulle est étroite : `label` est le texte court, `name` le titre de la fiche.
-        label: text(data.label) || name,
-        category: text(data.category),
+        label: t("label") || name,
+        category: t("category"),
         accent: toAccent(data.accent),
         x: toPercent(data.x),
         y: toPercent(data.y),
         order: toOrder(data.order),
         status: text(data.status),
         year: text(data.year),
-        description: text(data.description),
-        idea: text(data.idea),
-        learnings: text(data.learnings),
-        nextSteps: text(data.nextSteps),
+        description: t("description"),
+        idea: t("idea"),
+        learnings: t("learnings"),
+        nextSteps: t("nextSteps"),
         tech: toTech(data.tech),
-        links: toLinks(data.links),
+        links: toLinks(data.links, tr.links),
         images: toImages(data.images),
       } satisfies Experiment;
     })
@@ -170,14 +213,44 @@ export function getLab(experiments: Experiment[], contentDir: string = defaultCo
   return { experiments: layoutLab(experiments, edges), edges };
 }
 
-export function getStack(contentDir: string = defaultContentDir()): StackRow[] {
-  return readJson<{ rows: StackRow[] }>(contentDir, "stack.json").rows;
+/** Catégories rapprochées par rang : la traduction suit l'ordre du français. */
+export function getStack(contentDir: string = defaultContentDir(), locale: Locale = DEFAULT_LOCALE): StackRow[] {
+  const rows = readJson<{ rows: StackRow[] }>(contentDir, "stack.json").rows;
+  const tr = readJsonTranslation(contentDir, "stack.json", locale).rows;
+  const trRows = (Array.isArray(tr) ? tr : []) as Data[];
+  return rows.map((row, i) => ({
+    ...row,
+    label: text(trRows[i]?.label) || row.label,
+    items: translatedList(trRows[i]?.items, row.items),
+  }));
 }
 
-export function getRecommendations(contentDir: string = defaultContentDir()): Recommendation[] {
-  return readJson<{ items: Recommendation[] }>(contentDir, "recommendations.json").items;
+/** Témoignages rapprochés par `id` : nom et plateforme restent ceux du français. */
+export function getRecommendations(
+  contentDir: string = defaultContentDir(),
+  locale: Locale = DEFAULT_LOCALE
+): Recommendation[] {
+  const items = readJson<{ items: Recommendation[] }>(contentDir, "recommendations.json").items;
+  const tr = readJsonTranslation(contentDir, "recommendations.json", locale).items;
+  const byId = new Map(((Array.isArray(tr) ? tr : []) as Data[]).map((item) => [text(item?.id), item]));
+  return items.map((item) => {
+    const translated = byId.get(item.id) ?? {};
+    return {
+      ...item,
+      role: text(translated.role) || item.role,
+      text: text(translated.text) || item.text,
+    };
+  });
 }
 
-export function getProfile(contentDir: string = defaultContentDir()): Profile {
-  return readJson<Profile>(contentDir, "profile.json");
+/** Coordonnées, CV et photo viennent du français ; accroche, paragraphes et expertises se traduisent. */
+export function getProfile(contentDir: string = defaultContentDir(), locale: Locale = DEFAULT_LOCALE): Profile {
+  const profile = readJson<Profile>(contentDir, "profile.json");
+  const tr = readJsonTranslation(contentDir, "profile.json", locale);
+  return {
+    ...profile,
+    tagline: text(tr.tagline) || profile.tagline,
+    about: translatedList(tr.about, profile.about ?? []),
+    expertises: translatedList(tr.expertises, profile.expertises ?? []),
+  };
 }

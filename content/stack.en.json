@@ -1,0 +1,24 @@
+{
+  "rows": [
+    {
+      "label": "Back End",
+      "accent": "green",
+      "items": ["Node.js", "Nest.js", "TypeScript", "PostgreSQL", "REST API", "Python"]
+    },
+    {
+      "label": "Front End",
+      "accent": "yellow",
+      "items": ["React", "Next.js", "TypeScript", "Redux", "Tailwind", "Strapi"]
+    },
+    {
+      "label": "AI & Automation",
+      "accent": "cyan",
+      "items": ["OpenAI / Anthropic APIs", "Tool calling", "n8n", "Swiftask", "Claude Code"]
+    },
+    {
+      "label": "Infra & Tools",
+      "accent": "red",
+      "items": ["Docker", "Docker Swarm", "GitLab CI", "Linux", "Bash", "Grafana"]
+    }
+  ]
+}

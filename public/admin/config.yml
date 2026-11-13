@@ -12,6 +12,18 @@ backend:
 media_folder: public
 public_folder: /
 
+# Site bilingue : le français est la langue par défaut et garde les fichiers
+# sans suffixe (makidoo.md, profile.json) ; l'anglais vit dans un jumeau suffixé
+# (makidoo.en.md, profile.en.json). Les champs sans `i18n` (ordre, couleurs,
+# images, positions…) ne s'éditent qu'en français : lib/content.ts les lit
+# toujours dans le fichier français, et un texte non traduit retombe sur le
+# français.
+i18n:
+  structure: multiple_files
+  locales: [fr, en]
+  default_locale: fr
+  omit_default_locale_from_file_path: true
+
 collections:
   - name: projects
     label: Projets
@@ -21,30 +33,32 @@ collections:
     public_folder: /projects
     extension: md
     create: true
+    i18n: true
     # Le nom de fichier est l'`id` que dérive lib/content.ts.
     identifier_field: name
     slug: "{{slug}}"
     fields:
-      - { name: name, label: Nom, widget: string }
+      - { name: name, label: Nom, widget: string, i18n: true }
       - name: status
         label: Statut
         widget: select
         required: false
         options: ["Delivered", "In development"]
-      - { name: role, label: Rôle, widget: string, required: false }
+      - { name: role, label: Rôle, widget: string, required: false, i18n: true }
       - { name: order, label: Ordre d'affichage, widget: number, value_type: int, default: 999 }
-      - { name: description, label: Description courte, widget: text, required: false }
-      - { name: mission, label: Mission, widget: text, required: false }
-      - { name: problem, label: Problème, widget: text, required: false }
-      - { name: method, label: Méthode, widget: text, required: false }
-      - { name: result, label: Résultat, widget: text, required: false }
+      - { name: description, label: Description courte, widget: text, required: false, i18n: true }
+      - { name: mission, label: Mission, widget: text, required: false, i18n: true }
+      - { name: problem, label: Problème, widget: text, required: false, i18n: true }
+      - { name: method, label: Méthode, widget: text, required: false, i18n: true }
+      - { name: result, label: Résultat, widget: text, required: false, i18n: true }
       - name: links
         label: Liens
         widget: list
         required: false
+        i18n: true
         fields:
-          - { name: label, label: Libellé, widget: string }
-          - { name: href, label: URL, widget: string }
+          - { name: label, label: Libellé, widget: string, i18n: true }
+          - { name: href, label: URL, widget: string, i18n: duplicate }
       - name: images
         label: Images
         widget: list
@@ -59,17 +73,19 @@ collections:
     public_folder: /projects
     extension: md
     create: true
+    i18n: true
     # Le nom de fichier est l'`id` que dérive lib/content.ts — et l'identifiant
     # utilisé par les liaisons du Laboratory.
     identifier_field: name
     slug: "{{slug}}"
     fields:
-      - { name: name, label: Nom, widget: string }
+      - { name: name, label: Nom, widget: string, i18n: true }
       - name: label
         label: "Texte de la bulle (défaut : le nom)"
         widget: string
         required: false
-      - { name: category, label: Catégorie, widget: string, required: false }
+        i18n: true
+      - { name: category, label: Catégorie, widget: string, required: false, i18n: true }
       - name: accent
         label: Couleur de la bulle
         widget: select
@@ -86,10 +102,10 @@ collections:
         required: false
         options: ["Prototype", "Ongoing", "Paused", "Abandoned"]
       - { name: year, label: Année, widget: string, required: false }
-      - { name: description, label: Description courte, widget: text, required: false }
-      - { name: idea, label: L'idée de départ, widget: text, required: false }
-      - { name: learnings, label: Ce que ça m'a appris, widget: text, required: false }
-      - { name: nextSteps, label: Ce qu'il resterait à faire, widget: text, required: false }
+      - { name: description, label: Description courte, widget: text, required: false, i18n: true }
+      - { name: idea, label: L'idée de départ, widget: text, required: false, i18n: true }
+      - { name: learnings, label: Ce que ça m'a appris, widget: text, required: false, i18n: true }
+      - { name: nextSteps, label: Ce qu'il resterait à faire, widget: text, required: false, i18n: true }
       - name: tech
         label: Technologies
         widget: list
@@ -99,9 +115,10 @@ collections:
         label: Liens
         widget: list
         required: false
+        i18n: true
         fields:
-          - { name: label, label: Libellé, widget: string }
-          - { name: href, label: URL, widget: string }
+          - { name: label, label: Libellé, widget: string, i18n: true }
+          - { name: href, label: URL, widget: string, i18n: duplicate }
       - name: images
         label: Images
         widget: list
@@ -110,13 +127,15 @@ collections:
 
   - name: site
     label: Contenu du site
+    i18n: true
     files:
       - name: profile
         label: Profil
-        file: content/profile.json
+        file: content/profile.{{locale}}.json
+        i18n: true
         fields:
           - { name: name, label: Nom, widget: string }
-          - { name: tagline, label: Accroche, widget: text }
+          - { name: tagline, label: Accroche, widget: text, i18n: true }
           - { name: email, label: E-mail, widget: string }
           - { name: phone, label: Téléphone, widget: string }
           - { name: linkedin, label: LinkedIn, widget: string }
@@ -131,49 +150,62 @@ collections:
           - name: about
             label: Paragraphes « À propos »
             widget: list
+            i18n: true
             field: { name: paragraph, label: Paragraphe, widget: text }
           - name: expertises
             label: Expertises
             widget: list
+            i18n: true
             field: { name: item, label: Expertise, widget: string }
 
       - name: stack
         label: Stack
-        file: content/stack.json
+        file: content/stack.{{locale}}.json
+        i18n: true
         fields:
+          # Les catégories sont rapprochées par rang : ajouter, retirer ou
+          # réordonner une catégorie se fait en français.
           - name: rows
             label: Catégories
             widget: list
+            i18n: true
             fields:
-              - { name: label, label: Catégorie, widget: string }
+              - { name: label, label: Catégorie, widget: string, i18n: true }
               - name: accent
                 label: Couleur
                 widget: select
                 options: [green, cyan, yellow, red, violet]
+                i18n: duplicate
               - name: items
                 label: Technologies
                 widget: list
+                i18n: true
                 field: { name: item, label: Technologie, widget: string }
 
       - name: recommendations
         label: Recommandations
-        file: content/recommendations.json
+        file: content/recommendations.{{locale}}.json
+        i18n: true
         fields:
+          # Les témoignages sont rapprochés par identifiant : nom et plateforme
+          # restent ceux du français, seuls le rôle et le texte se traduisent.
           - name: items
             label: Témoignages
             widget: list
+            i18n: true
             fields:
-              - { name: id, label: Identifiant, widget: string }
+              - { name: id, label: Identifiant, widget: string, i18n: duplicate }
               - name: source
                 label: Plateforme d'origine
                 widget: select
                 default: linkedin
+                i18n: duplicate
                 options:
                   - { label: LinkedIn, value: linkedin }
                   - { label: Malt, value: malt }
-              - { name: name, label: Nom, widget: string }
-              - { name: role, label: Rôle, widget: string }
-              - { name: text, label: Texte, widget: text }
+              - { name: name, label: Nom, widget: string, i18n: duplicate }
+              - { name: role, label: Rôle, widget: string, i18n: true }
+              - { name: text, label: Texte, widget: text, i18n: true }
 
       - name: lab
         label: Laboratory (liaisons)

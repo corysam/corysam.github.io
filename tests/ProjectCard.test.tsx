@@ -9,7 +9,7 @@ describe("ProjectCard", () => {
     const p = makeProject();
     render(<ProjectCard project={p} onOpen={vi.fn()} />);
 
-    expect(screen.getByText("Delivered")).toBeInTheDocument();
+    expect(screen.getByText("Livré")).toBeInTheDocument();
     expect(screen.getByText(p.name)).toBeInTheDocument();
     expect(screen.getByText(p.role)).toBeInTheDocument();
     expect(screen.getByText(p.description)).toBeInTheDocument();

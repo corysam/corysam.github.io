@@ -3,10 +3,13 @@
 import { useEffect, useState } from "react";
 import { motion } from "motion/react";
 import { Menu, X } from "lucide-react";
-import { SECTIONS } from "@/lib/sections";
+import { SECTIONS, type SectionId } from "@/lib/sections";
+import { useI18n } from "./I18nProvider";
+import { LanguageSwitcher } from "./LanguageSwitcher";
 
 export function Navbar() {
-  const [active, setActive] = useState<string>(SECTIONS[0].id);
+  const { t } = useI18n();
+  const [active, setActive] = useState<SectionId>(SECTIONS[0].id);
   const [open, setOpen] = useState(false);
 
   // Met à jour l'onglet actif : on choisit la dernière section dont le haut
@@ -14,7 +17,7 @@ export function Navbar() {
   useEffect(() => {
     const update = () => {
       const line = 120; // hauteur sous le header servant de repère
-      let current: string = SECTIONS[0].id;
+      let current: SectionId = SECTIONS[0].id;
       for (const s of SECTIONS) {
         const el = document.getElementById(s.id);
         if (el && el.getBoundingClientRect().top <= line) current = s.id;
@@ -34,7 +37,7 @@ export function Navbar() {
     };
   }, []);
 
-  const go = (id: string) => {
+  const go = (id: SectionId) => {
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
     setOpen(false);
   };
@@ -42,8 +45,8 @@ export function Navbar() {
   return (
     <header className="fixed top-0 left-0 right-0 z-50 border-b border-line-soft bg-[rgba(11,18,38,0.85)] backdrop-blur-md">
       <nav className="relative mx-auto flex max-w-6xl items-center justify-center px-5 sm:px-8">
-        {/* Tabs desktop répartis sur toute la largeur */}
-        <ul className="hidden md:flex items-stretch justify-center gap-[70px]">
+        {/* Tabs desktop centrés ; l'écart se resserre entre md et lg pour laisser la place au globe */}
+        <ul className="hidden md:flex items-stretch justify-center gap-6 lg:gap-[70px]">
           {SECTIONS.map((item) => {
             const isActive = active === item.id;
             return (
@@ -54,7 +57,7 @@ export function Navbar() {
                     isActive ? "text-white" : "text-muted hover:text-ink"
                   }`}
                 >
-                  {item.label}
+                  {t.nav[item.id]}
                   {isActive && (
                     <motion.span
                       layoutId="nav-underline"
@@ -68,11 +71,17 @@ export function Navbar() {
           })}
         </ul>
 
-        {/* Mobile : seulement le bouton menu, aligné à droite */}
+        {/* Bouton de langue, à droite : à côté du menu sur mobile, seul sur desktop */}
+        <div className="absolute right-14 top-1/2 -translate-y-1/2 md:right-5">
+          <LanguageSwitcher section={active} />
+        </div>
+
+        {/* Mobile : bouton menu, aligné à droite */}
         <button
           className="md:hidden absolute right-5 top-1/2 -translate-y-1/2 rounded-md p-2 text-ink"
           onClick={() => setOpen((o) => !o)}
-          aria-label="Menu"
+          aria-label={t.navbar.menu}
+          aria-expanded={open}
         >
           {open ? <X size={20} /> : <Menu size={20} />}
         </button>
@@ -94,7 +103,7 @@ export function Navbar() {
                   active === item.id ? "text-white" : "text-muted"
                 }`}
               >
-                {item.label}
+                {t.nav[item.id]}
               </button>
             </li>
           ))}

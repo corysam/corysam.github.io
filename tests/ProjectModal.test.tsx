@@ -30,7 +30,7 @@ describe("ProjectModal", () => {
 
     expect(screen.getByRole("heading", { level: 2 })).toHaveTextContent(p.name);
     expect(screen.getByText(p.role)).toBeInTheDocument();
-    for (const label of ["Mission", "Problem", "Method", "Result"]) {
+    for (const label of ["Mission", "Problème", "Méthode", "Résultat"]) {
       expect(screen.getByText(label)).toBeInTheDocument();
     }
     expect(screen.getByText(p.mission)).toBeInTheDocument();
@@ -100,7 +100,7 @@ describe("ProjectModal", () => {
 
     expect(screen.getByText("Mission")).toBeInTheDocument();
     expect(screen.getByText("La mission.")).toBeInTheDocument();
-    for (const label of ["Problem", "Method", "Result"]) {
+    for (const label of ["Problème", "Méthode", "Résultat"]) {
       expect(screen.queryByText(label)).not.toBeInTheDocument();
     }
   });
@@ -109,7 +109,7 @@ describe("ProjectModal", () => {
     render(<ProjectModal project={emptyProject} onClose={vi.fn()} />);
 
     expect(screen.getByRole("dialog")).toHaveAccessibleName("Movies Reco");
-    for (const label of ["Mission", "Problem", "Method", "Result"]) {
+    for (const label of ["Mission", "Problème", "Méthode", "Résultat"]) {
       expect(screen.queryByText(label)).not.toBeInTheDocument();
     }
     expect(screen.queryAllByRole("link")).toHaveLength(0);

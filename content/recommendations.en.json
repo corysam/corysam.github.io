@@ -1,0 +1,25 @@
+{
+  "items": [
+    {
+      "id": "r1",
+      "source": "linkedin",
+      "name": "Fabrice Touzet",
+      "role": "Agency Director / Manager",
+      "text": "Committed, willing and great to be around, Clément was a first-rate colleague and a pleasure to work with. His sociability and his involvement in the life of the agency are real assets, complementing a genuine appetite for technical work and a very keen curiosity about tech.\nIt is therefore with pleasure that I recommend him to a future employer."
+    },
+    {
+      "id": "2",
+      "source": "malt",
+      "name": "Dominique",
+      "role": "President, Carquefou Echecs association",
+      "text": "I have been president of the Carquefou Echecs association for 7 years, and the website I had built myself 14 years ago was starting to look seriously dated.\nSo I wanted to entrust a state-of-the-art front-end rebuild to Clément Pellat, whose Epitech background gives him complete training as an expert developer. He proved it to me by proposing Figma screens for the site's design, then the Strapi framework, suited to my environment.\nI strongly recommend Clément Pellat for any development work, as he has a very cross-functional view of all kinds of development (he is Full Stack), and also gives advice during the UI phase: he really listens to my needs and wishes, which mattered to me in getting a result suited to my association."
+    },
+    {
+      "id": "r3",
+      "source": "malt",
+      "name": "Olivier",
+      "role": "Co-founder, Data-Inceptio",
+      "text": "Great AI agent developer on Swiftask and sovereign AI"
+    }
+  ]
+}

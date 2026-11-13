@@ -3,6 +3,7 @@
 import { motion } from "motion/react";
 import { Briefcase, Linkedin, type LucideIcon } from "lucide-react";
 import { Section } from "./Section";
+import { useI18n } from "./I18nProvider";
 import { mix, SOURCE_COLORS, type Recommendation, type RecommendationSource } from "@/lib/types";
 
 /** Malt n'a pas d'icône dédiée dans lucide : la mallette évoque la mission freelance. */
@@ -34,8 +35,9 @@ function SourceBadge({ source }: { source: RecommendationSource }) {
 }
 
 export function Recommendations({ items }: { items: Recommendation[] }) {
+  const { t } = useI18n();
   return (
-    <Section id="recommandation" title="Recommandation">
+    <Section id="recommandation" title={t.titles.recommandation}>
       <div className="grid gap-5 sm:grid-cols-2">
         {items.map((r, i) => (
           <motion.article

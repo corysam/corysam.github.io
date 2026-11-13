@@ -53,7 +53,7 @@ describe("Showcase", () => {
     const dialog = await screen.findByRole("dialog");
     expect(dialog).toHaveAccessibleName(experimentA.name);
     // Rubriques d'expérience, absentes d'une fiche projet.
-    expect(screen.getByText("Idea")).toBeInTheDocument();
+    expect(screen.getByText("L'idée")).toBeInTheDocument();
     expect(screen.queryByText("Mission")).not.toBeInTheDocument();
   });
 

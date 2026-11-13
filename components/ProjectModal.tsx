@@ -3,6 +3,7 @@
 import type { Project } from "@/lib/types";
 import { StatusPill } from "./StatusPill";
 import { Modal, ModalImages, ModalLinks, ModalRows } from "./Modal";
+import { useI18n } from "./I18nProvider";
 
 export function ProjectModal({
   project,
@@ -11,6 +12,7 @@ export function ProjectModal({
   project: Project | null;
   onClose: () => void;
 }) {
+  const { t } = useI18n();
   return (
     <Modal
       open={project !== null}
@@ -27,10 +29,10 @@ export function ProjectModal({
 
           <ModalRows
             rows={[
-              { label: "Mission", text: project.mission },
-              { label: "Problem", text: project.problem },
-              { label: "Method", text: project.method },
-              { label: "Result", text: project.result },
+              { label: t.project.mission, text: project.mission },
+              { label: t.project.problem, text: project.problem },
+              { label: t.project.method, text: project.method },
+              { label: t.project.result, text: project.result },
             ]}
           />
           <ModalImages images={project.images} alt={project.name} />

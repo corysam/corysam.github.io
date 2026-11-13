@@ -5,6 +5,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { Mail, Phone, Linkedin, Download, ChevronDown, Check } from "lucide-react";
 import type { Profile } from "@/lib/types";
 import type { SectionId } from "@/lib/sections";
+import { useI18n } from "./I18nProvider";
 
 type Social =
   | { Icon: typeof Mail; label: string; type: "copy"; value: string }
@@ -40,13 +41,14 @@ async function copyToClipboard(value: string): Promise<boolean> {
 const SECTION_ID: SectionId = "home";
 
 export function Hero({ profile }: { profile: Profile }) {
+  const { t } = useI18n();
   const [copied, setCopied] = useState<string | null>(null);
   const copiedTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   const socials: Social[] = [
-    { Icon: Mail, label: "Email", type: "copy", value: profile.email },
-    { Icon: Phone, label: "Téléphone", type: "copy", value: profile.phone },
-    { Icon: Linkedin, label: "LinkedIn", type: "link", href: profile.linkedin },
+    { Icon: Mail, label: t.hero.email, type: "copy", value: profile.email },
+    { Icon: Phone, label: t.hero.phone, type: "copy", value: profile.phone },
+    { Icon: Linkedin, label: t.hero.linkedin, type: "link", href: profile.linkedin },
   ];
 
   useEffect(() => () => clearTimeout(copiedTimer.current), []);
@@ -78,7 +80,7 @@ export function Hero({ profile }: { profile: Profile }) {
         transition={{ duration: 0.5 }}
         className="text-sm text-muted"
       >
-        Hello I&apos;m
+        {t.hero.greeting}
       </motion.p>
 
       <motion.h1
@@ -152,7 +154,7 @@ export function Hero({ profile }: { profile: Profile }) {
                     >
                       <span className="block text-ink">{s.value}</span>
                       <span className="mt-0.5 flex items-center gap-1 text-status-green">
-                        <Check size={12} /> Copié dans le presse-papier
+                        <Check size={12} /> {t.hero.copied}
                       </span>
                     </motion.div>
                   )}
@@ -171,7 +173,7 @@ export function Hero({ profile }: { profile: Profile }) {
             className="flex items-center gap-2 rounded-full border border-line-soft px-5 py-2.5 text-sm text-muted transition-colors hover:border-white hover:text-white md:ml-1"
           >
             <Download size={16} />
-            Download Resume
+            {t.hero.resume}
           </motion.a>
         )}
       </motion.div>
@@ -179,7 +181,7 @@ export function Hero({ profile }: { profile: Profile }) {
       {/* Flèche de scroll vers la section suivante */}
       <motion.button
         onClick={scrollDown}
-        aria-label="Voir la suite"
+        aria-label={t.hero.scrollDown}
         className="absolute bottom-8 left-1/2 -translate-x-1/2 text-muted transition-colors hover:text-white"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1, y: [0, 8, 0] }}

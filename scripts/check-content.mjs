@@ -17,6 +17,13 @@ const report = (file, message) => findings.push({ file, message });
 const LOREM =
   /lorem ipsum|dolor sit amet|consectetur adipiscing|maecenas|suspendisse|nullam quis|sed ut perspiciatis|vestibulum/i;
 
+// Les traductions (`makidoo.en.md`, `profile.en.json`) sont les jumeaux des
+// fichiers français : les contrôles par entrée ne portent que sur le français,
+// la section 7 vérifie ensuite que chaque entrée a sa traduction.
+const TRANSLATION_LOCALES = ["en"];
+const isEntry = (file) =>
+  file.endsWith(".md") && !TRANSLATION_LOCALES.some((l) => file.endsWith(`.${l}.md`));
+
 const walk = (dir) =>
   fs.readdirSync(dir, { withFileTypes: true }).flatMap((e) => {
     const full = path.join(dir, e.name);
@@ -62,7 +69,7 @@ const experimentsDir = path.join(contentDir, "experiments");
 const experimentIds = fs.existsSync(experimentsDir)
   ? fs
       .readdirSync(experimentsDir)
-      .filter((f) => f.endsWith(".md"))
+      .filter(isEntry)
       .map((f) => f.replace(/\.md$/, ""))
   : [];
 
@@ -111,7 +118,7 @@ const KNOWN_STATUSES = ["Delivered", "In development"];
 
 const projectsDir = path.join(contentDir, "projects");
 if (fs.existsSync(projectsDir)) {
-  for (const file of fs.readdirSync(projectsDir).filter((f) => f.endsWith(".md"))) {
+  for (const file of fs.readdirSync(projectsDir).filter(isEntry)) {
     const rel = path.join("content", "projects", file);
     const { data } = matter(fs.readFileSync(path.join(projectsDir, file), "utf8"));
 
@@ -137,7 +144,7 @@ const KNOWN_EXPERIMENT_STATUSES = ["Prototype", "Ongoing", "Paused", "Abandoned"
 const ACCENTS = ["green", "cyan", "yellow", "red", "violet"];
 
 if (fs.existsSync(experimentsDir)) {
-  for (const file of fs.readdirSync(experimentsDir).filter((f) => f.endsWith(".md"))) {
+  for (const file of fs.readdirSync(experimentsDir).filter(isEntry)) {
     const rel = path.join("content", "experiments", file);
     const { data } = matter(fs.readFileSync(path.join(experimentsDir, file), "utf8"));
 
@@ -162,6 +169,45 @@ if (fs.existsSync(experimentsDir)) {
       if (!Number.isFinite(n) || n < 0 || n > 100) {
         report(rel, `${axis} = ${value} : position hors du cadre (0-100)`);
       }
+    }
+  }
+}
+
+// 7. Traductions : une entrée sans jumeau anglais, ou un texte rempli en
+// français mais vide en anglais, s'affiche en français sur /en/ (repli de
+// lib/content.ts) — rien ne casse, mais la version anglaise reste incomplète.
+const TRANSLATED_FIELDS = {
+  projects: ["name", "role", "description", "mission", "problem", "method", "result"],
+  experiments: ["name", "category", "description", "idea", "learnings", "nextSteps"],
+};
+
+for (const [collection, fields] of Object.entries(TRANSLATED_FIELDS)) {
+  const dir = path.join(contentDir, collection);
+  if (!fs.existsSync(dir)) continue;
+  for (const file of fs.readdirSync(dir).filter(isEntry)) {
+    const { data: fr } = matter(fs.readFileSync(path.join(dir, file), "utf8"));
+    for (const locale of TRANSLATION_LOCALES) {
+      const translated = file.replace(/\.md$/, `.${locale}.md`);
+      const rel = path.join("content", collection, translated);
+      if (!fs.existsSync(path.join(dir, translated))) {
+        report(rel, `traduction "${locale}" absente — la fiche s'affiche en français`);
+        continue;
+      }
+      const { data } = matter(fs.readFileSync(path.join(dir, translated), "utf8"));
+      const missing = fields.filter(
+        (f) => String(fr[f] ?? "").trim() !== "" && String(data[f] ?? "").trim() === ""
+      );
+      if (missing.length > 0) report(rel, `non traduit (affiché en français) : ${missing.join(", ")}`);
+    }
+  }
+}
+
+for (const file of ["profile.json", "stack.json", "recommendations.json"]) {
+  if (!fs.existsSync(path.join(contentDir, file))) continue;
+  for (const locale of TRANSLATION_LOCALES) {
+    const translated = file.replace(/\.json$/, `.${locale}.json`);
+    if (!fs.existsSync(path.join(contentDir, translated))) {
+      report(path.join("content", translated), `traduction "${locale}" absente — affichée en français`);
     }
   }
 }

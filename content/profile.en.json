@@ -1,0 +1,9 @@
+{
+  "tagline": "Fullstack TypeScript developer since 2020. I build web applications in production and, since 2025, LLM-powered agents and automations.",
+  "about": [
+    "An Epitech graduate, I spent four years in Nantes building and maintaining web applications for startups and public-sector clients: Nest.js APIs, React front-ends, Docker deployments and Linux server administration. I enjoy projects where I own the whole chain, from the database all the way to production.",
+    "Since late 2024, I have been freelancing from Bangkok. I delivered a headless Strapi / React website for a chess club, including the full migration from Drupal, then AI automation agents for a data agency. That second project convinced me that a developer's value is shifting towards designing systems that integrate LLMs reliably: orchestration, evaluation, costs, observability.",
+    "I am moving back to France in February 2027 and I am available now for remote, freelance or permanent positions."
+  ],
+  "expertises": ["TypeScript", "React", "Node.js / Nest.js", "PostgreSQL", "Docker", "LLM agents"]
+}

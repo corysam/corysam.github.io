@@ -25,7 +25,7 @@ describe("Hero — copie dans le presse-papier (régression audit B1)", () => {
     setClipboard({ writeText });
     render(<Hero profile={profile} />);
 
-    await userEvent.click(screen.getByRole("button", { name: "Email" }));
+    await userEvent.click(screen.getByRole("button", { name: "E-mail" }));
 
     expect(writeText).toHaveBeenCalledWith(profile.email);
     expect(await screen.findByText(CONFIRMATION)).toBeInTheDocument();
@@ -38,7 +38,7 @@ describe("Hero — copie dans le presse-papier (régression audit B1)", () => {
     document.execCommand = vi.fn(() => false);
     render(<Hero profile={profile} />);
 
-    await userEvent.click(screen.getByRole("button", { name: "Email" }));
+    await userEvent.click(screen.getByRole("button", { name: "E-mail" }));
 
     await waitFor(() => expect(document.execCommand).toHaveBeenCalledWith("copy"));
     expect(screen.queryByText(CONFIRMATION)).not.toBeInTheDocument();
@@ -59,7 +59,7 @@ describe("Hero — copie dans le presse-papier (régression audit B1)", () => {
     document.execCommand = vi.fn(() => false);
     render(<Hero profile={profile} />);
 
-    await userEvent.click(screen.getByRole("button", { name: "Email" }));
+    await userEvent.click(screen.getByRole("button", { name: "E-mail" }));
 
     await waitFor(() => expect(document.execCommand).toHaveBeenCalled());
     expect(screen.queryByText(CONFIRMATION)).not.toBeInTheDocument();
@@ -83,11 +83,11 @@ describe("Hero — contenu", () => {
   // Audit M5 : le bouton CV ne doit pas pointer vers "#".
   it("masque le bouton CV quand aucun CV n'est fourni", () => {
     render(<Hero profile={{ ...profile, resume: null }} />);
-    expect(screen.queryByText("Download Resume")).not.toBeInTheDocument();
+    expect(screen.queryByText("Télécharger le CV")).not.toBeInTheDocument();
   });
 
   it("affiche le bouton CV quand un CV est fourni", () => {
     render(<Hero profile={{ ...profile, resume: "/cv.pdf" }} />);
-    expect(screen.getByRole("link", { name: /Download Resume/ })).toHaveAttribute("href", "/cv.pdf");
+    expect(screen.getByRole("link", { name: /Télécharger le CV/ })).toHaveAttribute("href", "/cv.pdf");
   });
 });

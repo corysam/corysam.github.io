@@ -4,11 +4,13 @@ import { motion } from "motion/react";
 import { Section } from "./Section";
 import type { StackRow } from "@/lib/types";
 import { ACCENT_COLORS } from "@/lib/types";
+import { useI18n } from "./I18nProvider";
 
 // Affiche les vraies technologies du contenu (audit M3 : plus de ronds vides).
 export function Stack({ rows }: { rows: StackRow[] }) {
+  const { t } = useI18n();
   return (
-    <Section id="stack" title="Stack">
+    <Section id="stack" title={t.titles.stack}>
       <div className="flex flex-col">
         {rows.map((row, r) => (
           <div key={row.label}>

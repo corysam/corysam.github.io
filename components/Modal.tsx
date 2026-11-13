@@ -5,6 +5,7 @@ import { useEffect } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { X } from "lucide-react";
 import { ImageWithFallback } from "./ImageWithFallback";
+import { useI18n } from "./I18nProvider";
 
 /**
  * Coque partagée par les fiches Projet et Expérience : fond, verrouillage du
@@ -26,6 +27,7 @@ export function Modal({
   header?: ReactNode;
   children: ReactNode;
 }) {
+  const { t } = useI18n();
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
     if (open) {
@@ -66,7 +68,7 @@ export function Modal({
                 whileHover={{ rotate: 90, scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
                 className="ml-auto grid h-9 w-9 shrink-0 place-items-center rounded-full text-muted transition-colors hover:text-white"
-                aria-label="Fermer"
+                aria-label={t.modal.close}
               >
                 <X size={18} />
               </motion.button>
@@ -115,6 +117,7 @@ export function ModalRows({ rows }: { rows: { label: string; text: string }[] })
 
 /** Galerie d'aperçus, identique sur les deux fiches. */
 export function ModalImages({ images, alt }: { images: string[]; alt: string }) {
+  const { t } = useI18n();
   if (images.length === 0) return null;
 
   return (
@@ -129,7 +132,7 @@ export function ModalImages({ images, alt }: { images: string[]; alt: string }) 
         >
           <ImageWithFallback
             src={src}
-            alt={`${alt} aperçu ${i + 1}`}
+            alt={t.modal.preview(alt, i + 1)}
             className="aspect-[4/3] h-full w-full object-cover"
           />
         </motion.div>

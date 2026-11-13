@@ -3,6 +3,7 @@
 import { motion } from "motion/react";
 import type { SectionId } from "@/lib/sections";
 import { ImageWithFallback } from "@/components/ImageWithFallback";
+import { useI18n } from "./I18nProvider";
 
 // Ancré sur SECTIONS : renommer l'id côté nav casse la compilation ici (audit D4).
 const SECTION_ID: SectionId = "about";
@@ -17,6 +18,7 @@ export function About({
   /** Chemin public de la photo ; absent ou vide (champ vidé dans le CMS) = cadre vide. */
   photo?: string | null;
 }) {
+  const { t } = useI18n();
   return (
     <section id={SECTION_ID} className="mx-auto w-full max-w-5xl px-5 sm:px-6 py-20 sm:py-28 scroll-mt-24">
       <div className="grid gap-10 md:grid-cols-[380px_1fr] md:items-start">
@@ -28,7 +30,7 @@ export function About({
           transition={{ duration: 0.6 }}
           className="mx-auto aspect-[4/5] w-full max-w-[380px] overflow-hidden rounded-xl border border-line-soft bg-[rgba(200,205,220,0.6)] md:mx-0"
         >
-          {photo && <ImageWithFallback src={photo} alt="Photo de profil" className="h-full w-full object-cover" />}
+          {photo && <ImageWithFallback src={photo} alt={t.about.photoAlt} className="h-full w-full object-cover" />}
         </motion.div>
 
         {/* Colonne droite : titre collé à droite, puis texte, puis tags */}
@@ -39,7 +41,7 @@ export function About({
           transition={{ duration: 0.6, delay: 0.1 }}
           className="mx-auto max-w-md text-center md:ml-auto md:mr-0 md:text-right"
         >
-          <h2 className="text-2xl sm:text-3xl text-ink">About me</h2>
+          <h2 className="text-2xl sm:text-3xl text-ink">{t.about.title}</h2>
 
           {paragraphs.map((text, i) => (
             <p

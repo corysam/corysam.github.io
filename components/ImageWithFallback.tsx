@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { ImageOff } from "lucide-react";
+import { useI18n } from "./I18nProvider";
 
 export function ImageWithFallback({
   src,
@@ -12,6 +13,7 @@ export function ImageWithFallback({
   alt: string;
   className?: string;
 }) {
+  const { t } = useI18n();
   const [didError, setDidError] = useState(false);
   const [renderedSrc, setRenderedSrc] = useState(src);
 
@@ -26,7 +28,7 @@ export function ImageWithFallback({
   if (didError) {
     return (
       <div className={`grid place-items-center bg-card text-muted ${className ?? ""}`}>
-        <ImageOff size={28} aria-label={`Image indisponible : ${alt}`} />
+        <ImageOff size={28} aria-label={t.modal.imageUnavailable(alt)} />
       </div>
     );
   }

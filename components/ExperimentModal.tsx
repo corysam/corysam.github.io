@@ -2,10 +2,13 @@
 
 import type { Experiment } from "@/lib/types";
 import { experimentStatusColor, mix } from "@/lib/types";
+import { statusLabel } from "@/lib/i18n";
 import { Modal, ModalImages, ModalLinks, ModalRows } from "./Modal";
+import { useI18n } from "./I18nProvider";
 
 /** Pastille de statut d'une expérience — couleurs propres aux side projects. */
 function ExperimentStatusPill({ status }: { status: string }) {
+  const { t } = useI18n();
   if (!status) return null;
 
   const color = experimentStatusColor(status);
@@ -18,7 +21,7 @@ function ExperimentStatusPill({ status }: { status: string }) {
         backgroundColor: mix(color, 8),
       }}
     >
-      {status}
+      {statusLabel(t, status)}
     </span>
   );
 }
@@ -30,6 +33,7 @@ export function ExperimentModal({
   experiment: Experiment | null;
   onClose: () => void;
 }) {
+  const { t } = useI18n();
   // Catégorie et année se lisent comme une seule ligne : « Simulation · 2025 ».
   const context = experiment ? [experiment.category, experiment.year].filter(Boolean) : [];
 
@@ -51,15 +55,15 @@ export function ExperimentModal({
               mission, ce que ça a appris plutôt que le livrable. */}
           <ModalRows
             rows={[
-              { label: "Description", text: experiment.description },
-              { label: "Idea", text: experiment.idea },
-              { label: "Learnings", text: experiment.learnings },
-              { label: "Next steps", text: experiment.nextSteps },
+              { label: t.experiment.description, text: experiment.description },
+              { label: t.experiment.idea, text: experiment.idea },
+              { label: t.experiment.learnings, text: experiment.learnings },
+              { label: t.experiment.nextSteps, text: experiment.nextSteps },
             ]}
           />
 
           {experiment.tech.length > 0 && (
-            <ul aria-label="Technologies" className="mt-6 flex flex-wrap gap-2">
+            <ul aria-label={t.experiment.tech} className="mt-6 flex flex-wrap gap-2">
               {experiment.tech.map((item) => (
                 <li
                   key={item}
