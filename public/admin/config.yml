@@ -7,14 +7,18 @@ backend:
   repo: corysam/corysam.github.io
   branch: main
 
-media_folder: public/projects
-public_folder: /projects
+# Par défaut, les médias vont dans public/ (servis à la racine : /fichier).
+# Les collections projects et experiments surchargent vers public/projects/.
+media_folder: public
+public_folder: /
 
 collections:
   - name: projects
     label: Projets
     label_singular: Projet
     folder: content/projects
+    media_folder: /public/projects
+    public_folder: /projects
     extension: md
     create: true
     # Le nom de fichier est l'`id` que dérive lib/content.ts.
@@ -51,6 +55,8 @@ collections:
     label: Expériences
     label_singular: Expérience
     folder: content/experiments
+    media_folder: /public/projects
+    public_folder: /projects
     extension: md
     create: true
     # Le nom de fichier est l'`id` que dérive lib/content.ts — et l'identifiant
@@ -115,8 +121,8 @@ collections:
           - { name: phone, label: Téléphone, widget: string }
           - { name: linkedin, label: LinkedIn, widget: string }
           - name: resume
-            label: Chemin du CV dans public/ (ex. /resume.pdf)
-            widget: string
+            label: CV (PDF, déposé dans public/)
+            widget: file
             required: false
           - name: about
             label: Paragraphes « À propos »
