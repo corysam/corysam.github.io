@@ -13,7 +13,6 @@ idea: >-
   Assembler les expériences du labo en un vrai service de production :
   mesuré, tracé, déployé, et directement testable par les visiteurs du site.
 learnings: >-
-  [À remplir]
 nextSteps: >-
   Publier le dépôt avec les résultats d'évaluation et un retour d'expérience
   écrit.

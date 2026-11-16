@@ -11,8 +11,6 @@ description: >-
 idea: >-
   Rendre les capacités de l'assistant utilisables par n'importe quel client
   compatible MCP, pas seulement par mon interface.
-learnings: >-
-  [À remplir]
 nextSteps: >-
   Exposer la recherche documentaire de l'assistant comme outil MCP.
 tech:

@@ -12,8 +12,6 @@ description: >-
 idea: >-
   Pouvoir changer un prompt, un modèle ou un paramètre de recherche et savoir
   immédiatement si le système s'améliore ou se dégrade.
-learnings: >-
-  [À remplir]
 nextSteps: >-
   Ajouter le suivi du coût en tokens et le tracing de chaque appel.
 tech:

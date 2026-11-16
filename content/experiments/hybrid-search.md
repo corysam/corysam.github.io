@@ -12,8 +12,6 @@ description: >-
 idea: >-
   Mesurer ce que la recherche hybride et le chunking apportent réellement par
   rapport à une recherche vectorielle seule.
-learnings: >-
-  [À remplir]
 nextSteps: >-
   Brancher la recherche sur le corpus de l'assistant du portfolio.
 tech:

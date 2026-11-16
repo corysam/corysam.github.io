@@ -11,8 +11,6 @@ description: >-
 idea: >-
   Comprendre ce que font réellement n8n ou LangChain sous le capot : le
   modèle appelle un outil, reçoit le résultat, décide de la suite.
-learnings: >-
-  [À remplir]
 nextSteps: >-
   Réutiliser la boucle comme cœur de l'assistant du portfolio.
 tech:
