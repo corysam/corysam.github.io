@@ -1,9 +1,9 @@
 ---
 name: AI automation agents — Data Inceptio
 role: Freelance AI agent developer
-description: Designed AI agents and automated workflows to replace repetitive manual processes.
-mission: Reduce a data agency's manual workload by handing LLM agents the processing, enrichment and information-routing tasks that kept the team busy every day.
-problem: Repetitive business processes, spread across several tools, relied on human intervention for simple decisions. Every manual step added delays and errors.
-method: "Mapped the existing workflows, then orchestrated them with n8n and Swiftask: LLM calls, third-party tool integrations, error handling, and human validation loops wherever the risk justified it."
-result: 'Several automated workflows in production, [X hours saved per week / Y documents processed per month], and hands-on experience of the real constraints of LLM-based systems: reliability, cost, monitoring.'
+description: "Three kinds of AI agents shipped in 2025: a conversational assistant on the public website, an agent connected to the Odoo CRM for the executive committee, and competitive-intelligence agents."
+mission: "From April to December 2025, design and deploy Data Inceptio's AI agents: guide website visitors, give the executive committee direct access to CRM data, and automate competitor monitoring."
+problem: "Website visitors had to dig through training offers, events and news on their own. Sales information stayed locked inside Odoo, and keeping track of competitors meant regular manual monitoring work."
+method: "Orchestrated with Swiftask and n8n: LLM calls, tool integrations (including the Odoo CRM) and multi-step workflows. A conversational assistant deployed on the public website guides visitors to training offers, events and company news; an agent connected to Odoo produces summaries and answers questions from the executive committee; competitive-intelligence agents monitor competitors' activity and deliver regular summaries."
+result: "Three agents in production replacing manual processes, and hands-on experience of the real constraints of LLM-based systems: reliability, cost, monitoring."
 ---
