@@ -139,6 +139,7 @@ collections:
           - { name: email, label: E-mail, widget: string }
           - { name: phone, label: Téléphone, widget: string }
           - { name: linkedin, label: LinkedIn, widget: string }
+          - { name: malt, label: Malt (URL du profil), widget: string, required: false }
           - name: resume
             label: CV (PDF, déposé dans public/)
             widget: file

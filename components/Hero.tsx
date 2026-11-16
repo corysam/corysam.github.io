@@ -2,14 +2,16 @@
 
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { Mail, Phone, Linkedin, Download, ChevronDown, Check } from "lucide-react";
+import { Mail, Phone, Linkedin, Briefcase, Download, ChevronDown, Check } from "lucide-react";
 import type { Profile } from "@/lib/types";
 import type { SectionId } from "@/lib/sections";
 import { useI18n } from "./I18nProvider";
 
-type Social =
-  | { Icon: typeof Mail; label: string; type: "copy"; value: string }
-  | { Icon: typeof Mail; label: string; type: "link"; href: string };
+/** `text` optionnel : affiché à droite de l'icône, le bouton passe alors du rond à la pilule. */
+type Social = { Icon: typeof Mail; label: string; text?: string } & (
+  | { type: "copy"; value: string }
+  | { type: "link"; href: string }
+);
 
 /** Copie `value` dans le presse-papier et retourne si la copie a réellement réussi (audit B1). */
 async function copyToClipboard(value: string): Promise<boolean> {
@@ -49,6 +51,10 @@ export function Hero({ profile }: { profile: Profile }) {
     { Icon: Mail, label: t.hero.email, type: "copy", value: profile.email },
     { Icon: Phone, label: t.hero.phone, type: "copy", value: profile.phone },
     { Icon: Linkedin, label: t.hero.linkedin, type: "link", href: profile.linkedin },
+    // Malt n'a pas d'icône lucide : la mallette (comme dans les recommandations) suivie du nom.
+    ...(profile.malt
+      ? [{ Icon: Briefcase, text: "Malt", label: t.hero.malt, type: "link" as const, href: profile.malt }]
+      : []),
   ];
 
   useEffect(() => () => clearTimeout(copiedTimer.current), []);
@@ -66,8 +72,10 @@ export function Hero({ profile }: { profile: Profile }) {
     }
   };
 
-  const iconButtonClass =
-    "grid h-10 w-10 place-items-center rounded-full border border-line-soft text-muted transition-colors hover:border-white hover:text-white";
+  const socialButtonBase =
+    "h-10 rounded-full border border-line-soft text-muted transition-colors hover:border-white hover:text-white";
+  const iconButtonClass = `grid w-10 place-items-center ${socialButtonBase}`;
+  const textButtonClass = `flex items-center gap-2 px-4 text-sm font-semibold ${socialButtonBase}`;
 
   return (
     <section
@@ -110,7 +118,14 @@ export function Hero({ profile }: { profile: Profile }) {
       >
         <div className="flex items-center gap-3">
           {socials.map((s) => {
-            const { Icon, label } = s;
+            const { Icon, label, text } = s;
+            const content = (
+              <>
+                <Icon size={18} />
+                {text && <span>{text}</span>}
+              </>
+            );
+            const buttonClass = text ? textButtonClass : iconButtonClass;
 
             if (s.type === "link") {
               return (
@@ -122,9 +137,9 @@ export function Hero({ profile }: { profile: Profile }) {
                   aria-label={label}
                   whileHover={{ y: -4, scale: 1.08 }}
                   whileTap={{ scale: 0.94 }}
-                  className={iconButtonClass}
+                  className={buttonClass}
                 >
-                  <Icon size={18} />
+                  {content}
                 </motion.a>
               );
             }
@@ -138,9 +153,9 @@ export function Hero({ profile }: { profile: Profile }) {
                   onClick={() => copyValue(label, s.value)}
                   whileHover={{ y: -4, scale: 1.08 }}
                   whileTap={{ scale: 0.94 }}
-                  className={iconButtonClass}
+                  className={buttonClass}
                 >
-                  <Icon size={18} />
+                  {content}
                 </motion.button>
 
                 <AnimatePresence>

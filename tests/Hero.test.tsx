@@ -80,6 +80,20 @@ describe("Hero — contenu", () => {
     expect(link).toHaveAttribute("rel", expect.stringContaining("noopener"));
   });
 
+  it("affiche le lien Malt après LinkedIn quand il est renseigné", () => {
+    render(<Hero profile={{ ...profile, malt: "https://www.malt.fr/profile/test" }} />);
+    const links = screen.getAllByRole("link").map((l) => l.getAttribute("aria-label"));
+    expect(links.indexOf("Malt")).toBe(links.indexOf("LinkedIn") + 1);
+    const link = screen.getByRole("link", { name: "Malt" });
+    expect(link).toHaveAttribute("href", "https://www.malt.fr/profile/test");
+    expect(link).toHaveAttribute("rel", expect.stringContaining("noopener"));
+  });
+
+  it("masque le lien Malt quand il n'est pas renseigné", () => {
+    render(<Hero profile={profile} />);
+    expect(screen.queryByRole("link", { name: "Malt" })).not.toBeInTheDocument();
+  });
+
   // Audit M5 : le bouton CV ne doit pas pointer vers "#".
   it("masque le bouton CV quand aucun CV n'est fourni", () => {
     render(<Hero profile={{ ...profile, resume: null }} />);

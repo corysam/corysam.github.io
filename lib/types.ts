@@ -90,6 +90,8 @@ export type Profile = {
   email: string;
   phone: string;
   linkedin: string;
+  /** Profil Malt (URL complète) ou absent pour masquer le bouton. */
+  malt?: string | null;
   /** Chemin vers le CV dans public/ (ex: "/resume.pdf") ou null pour masquer le bouton. */
   resume: string | null;
   /** Photo de la section « À propos », déposée dans public/ (ex: "/photo.jpg"). Absente = cadre vide. */
