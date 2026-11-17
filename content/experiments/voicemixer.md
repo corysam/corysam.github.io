@@ -2,9 +2,9 @@
 name: VoiceMixer
 label: ''
 category: ''
-accent: violet
+accent: cyan
 x: null
-y: null
+'y': null
 order: 999
 status: Prototype
 year: '2026'
