@@ -8,8 +8,6 @@ import { DEFAULT_LOCALE, LOCALES, LOCALE_STORAGE_KEY } from "@/lib/i18n";
 export const metadata: Metadata = {
   // `/` n'a pas de contenu propre : les moteurs indexent /fr/ et /en/.
   robots: { index: false, follow: true },
-  // Voir NO_FAVICON dans app/[lang]/layout.tsx.
-  icons: { icon: "data:," },
   alternates: {
     languages: Object.fromEntries(LOCALES.map((l) => [l, `/${l}/`])),
   },

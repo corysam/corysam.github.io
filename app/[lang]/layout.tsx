@@ -24,15 +24,6 @@ export function generateStaticParams() {
   return LOCALES.map((lang) => ({ lang }));
 }
 
-/**
- * Le site n'a pas de favicon : sans icône déclarée, le navigateur réclame
- * /favicon.ico, qui tombe dans la route /[lang] (lang = "favicon.ico"). En dev,
- * `output: "export"` en fait une erreur « missing param » à chaque chargement.
- * Une icône vide coupe cette requête — même rendu qu'avant (icône par défaut).
- * À remplacer par un vrai fichier (app/icon.svg) le jour où il y en a un.
- */
-const NO_FAVICON: Metadata["icons"] = { icon: "data:," };
-
 // Typage manuel plutôt que LayoutProps : `npm run typecheck` tourne en CI avant
 // le build, donc avant que Next ne génère ses types de routes.
 type Params = { params: Promise<{ lang: string }> };
@@ -47,7 +38,6 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
     metadataBase: new URL("https://corysam.github.io"),
     title: `${name} — ${t.role}`,
     description: t.description(name),
-    icons: NO_FAVICON,
     alternates: {
       canonical: localePath(lang),
       languages: Object.fromEntries(LOCALES.map((l) => [l, localePath(l)])),
