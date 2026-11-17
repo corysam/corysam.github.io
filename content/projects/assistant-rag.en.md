@@ -1,5 +1,5 @@
 ---
-name: Production RAG assistant
+name: RAG assistant
 role: Design & development
 description: An assistant that answers from a document corpus, with automated evaluations, cost tracking and observability.
 mission: 'Build, end to end, an LLM service the way production expects it in 2026: not a demo, but a measured, traced and deployed system.'
